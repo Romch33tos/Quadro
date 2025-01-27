@@ -1,11 +1,11 @@
-﻿using System;
+using System;
 using System.Net.Http.Headers;
 
 class Programm {
   static void Main() {
     
     Console.Write("Введите значение коэффициента а: ");
-    double a = Convert.ToDouble(Console.ReadLine());
+    duble a = Convert.ToDouble(Console.ReadLine());
 
     Console.Write("Введите значение коэффициента b: ");
     double b = Convert.ToDouble(Console.ReadLine());
