@@ -5,7 +5,7 @@ class Programm {
   static void Main() {
     
     Console.Write("Введите значение коэффициента а: ");
-    duble a = Convert.ToDouble(Console.ReadLine());
+    double a = Convert.ToDouble(Console.ReadLine());
 
     Console.Write("Введите значение коэффициента b: ");
     double b = Convert.ToDouble(Console.ReadLine());
