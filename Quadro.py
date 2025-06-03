@@ -2,14 +2,18 @@ from tkinter import *
 from tkinter import messagebox as mb
 import math
 
-def clear_all():
+#Функция очистки окон с информацией
+
+def clear_all(): 
 	answer = mb.askyesno( title="Очистить данные", message="Вы действительно хотите очистить все данные?")
 	if answer == True:
+		text.configure(state = NORMAL)
 		text.delete("1.0", END)
 		a1.delete(0, END)
 		b1.delete(0, END)
 		c1.delete(0, END)
 		a1.focus()
+		text.configure(state = DISABLED)
 		Button(window, state = DISABLED, width = 10, text = "D", command = lambda: discr()).grid(row = 1, column = 0, sticky = SW, padx = 810, pady = 10)
 		Button(window, state = DISABLED, width = 10, text = "D/4", command = lambda: halfcoef()).grid(row = 1, column = 0, sticky = SW, padx = 1090, pady = 10)
 		Button(window, state = DISABLED, width = 10, text = "Теорема Виета", command = lambda:Viet()).grid(row = 2, column = 0, sticky = SW, padx = 810, pady = 10)
@@ -19,38 +23,62 @@ def clear_all():
 		Button(window, state = DISABLED, width = 10, text = "Неполное", command = lambda: nepolnoe()).grid(row = 4, column = 0, sticky = SW, padx = 950, pady = 10)
 	else:
 		pass
+		
+#Инструкция
 	
-def how_to_use():
+def how_to_use(): 
 	answer = mb.showinfo(title = "Справка", message = "Инструкция:", detail = "1. Введите коэффициенты уравнения, следуя правилам ввода данных.\n2. Нажмите на кнопку «Готово». \n3. Выберите интересующий вас способ решения.\n4. Если вы хотите очистить данные, нажмите на кнопку «CLR».\n5. Чтобы завершить работу программы, нажмите на кнопку «Выйти»\nв верхней панели меню.")
 	
+#Правила ввода
+
 def entry_rules():
  	answer = mb.showinfo(title = "Справка", message = "Правила ввода:", detail = "1. Поле ввода не должно содержать лишних символов, кроме числового\nзначения коэффициента.\n2. Нельзя оставлять поле ввода пустым. Если один из коэффициентов\nотсутствует, вместо него нужно ввести 0. При этом, коэффициент а ≠ 0!\n3. Если перед х² или х отсутствует числовое значение, то это значит, что\nкоэффициент равен 1.")
- 	
+ 
+#Примеры для ввода
+
 def examples():
  	answer = mb.showinfo(title = "Справка", message = "В скобках указаны данные, необходимые для работы программы.", detail = "x² + 2x - 3 = 0 (a = 1, b = 2, c = -3)\nx² - x - 6 = 0 (a = 1, b = -1, c = -6)\n2х² - 50 = 0 (а = 2, b = 0, c = -50)\n3x² + 12x = 0 (a = 3, b = 12, c = 0)\n5x² = 0 (а = 5, b = 0, c = 0)")
- 	
+
+#Функция выхода
+
 def exit():
         answer = mb.askyesno( title="Выход", message="Вы действительно хотите выйти?")
-        if answer:
+        if answer == True:
         	window.quit()
- 	
+        else:
+        	pass
+        	
+#Проверка данных для опеределения дискриминанта и способов решения 
+	
 def ready():
 	try:
+		text.configure(state = NORMAL)
 		text.delete("1.0", END)
 		a = float(a1.get())
 		b = float(b1.get())
 		c  = float(c1.get())
 		d = (b**2 - 4*a*c)
-	except ValueError:
-		answer = mb.showerror(title = "Ошибка ввода" , message ="Убедитесь в том, что вы ввели все данные верно!")
+	except ValueError: 
+		answer = mb.showerror(title = "Ошибкa" , message ="Убедитесь в том, что вы ввели все данные верно!")
+		text.configure(state = DISABLED)
+	
+#Случай, если d > 0
+
 	if d > 0 and (a !=0) and (b !=0) and (c !=0):
+			text.configure(state = NORMAL)
 			text.insert("1.0", "D = b² - 4ac = " +str(round(b*b)) + " - 4 × " + str(round(a)) +" × " + str(round(c)) + " = " + str("%.2f"%(d)))
 			text.insert(END, "\nУравнение имеет два различных корня.")
 			text.insert(END, "\nВыберите способ решения. ")
+			text.configure(state = DISABLED)
+			
+#Случай, если d == 0
+
 	if d == 0 and (a !=0) and (b !=0) and (c !=0):
+		text.configure(state = NORMAL)
 		text.insert("1.0", "D = b² - 4ac = " +str(round(b*b)) + " - 4 × " + str(round(a)) +" × " + str(round(c)) + " = " + str("%.2f"%(d)))
 		text.insert(END, "\nУравнение имеет два одинаковых корня.")
 		text.insert(END, "\nВыберите способ решения.")
+		text.configure(state = DISABLED)
 	
 	Button(window, state = DISABLED, width = 10, text = "D", command = lambda: discr()).grid(row = 1, column = 0, sticky = SW, padx = 810, pady = 10)
 
@@ -65,60 +93,135 @@ def ready():
 	Button(window, state = DISABLED, width = 10, text = "Схема Горнера", command = lambda: Gorner()).grid(row = 3, column = 0, sticky = SW, padx = 1090, pady = 10)
 
 	Button(window, state = DISABLED, width = 10, text = "Неполное", command = lambda: nepolnoe()).grid(row = 4, column = 0, sticky = SW, padx = 950, pady = 10)
-		
+
+#Алгортим активации кнопок
+
+#Условия для дискриминанта
+
 	if (a !=0) and (b !=0) and (c !=0) and d >= 0:
 		Button(window, state = NORMAL,width = 10, text = "D", command = lambda: discr()).grid(row = 1, column = 0, sticky = SW, padx = 810, pady = 10)
+
+#Условия для половины коэффициента
 		
 	if (a !=0) and (b != 0) and (b % 2 == 0) and (c !=0) and d >= 0:
 		Button(window, state = NORMAL, width = 10, text = "D/4", command = lambda: halfcoef()).grid(row = 1, column = 0, sticky = SW, padx = 1090, pady = 10)
+
+#Условия для теоремы Виета
 		
 	if (a == 1) and (b != 0) and (c != 0) and d >= 0:
 		Button(window, state = NORMAL, width = 10, text = "Теорема Виета", command = lambda:Viet()).grid(row = 2, column = 0, sticky = SW, padx = 810, pady = 10)
+
+#Условия для метода переброски
 		
 	if (a != 0) and (b != 0) and (c != 0) and d >= 0:
 		Button(window, state = NORMAL, width = 10, text = "Переброска", command = lambda: perebros()).grid(row = 2, column = 0, sticky = SW, padx = 1090, pady = 10)
+
+#Условия для свойств коэффициентов
 		
 	if (a != 0) and (b != 0) and (c != 0)  and ((a + b + c == 0) or ( a - b + c == 0)) and d >= 0:
 		Button(window, state = NORMAL, width = 10, text = "a + b + c = 0", command = lambda: svoistva()).grid(row = 3, column = 0, sticky = SW, padx = 810, pady = 10)
+
+#Условия для схемы Горнера
 		
 	if (a != 0) and (b != 0) and (c != 0) and d >= 0:
 		Button(window, state = NORMAL, width = 10, text = "Схема Горнера", command = lambda: Gorner()).grid(row = 3, column = 0, sticky = SW, padx = 1090, pady = 10)
-		
+
+#ax² + c = 0
+				
 	if (a != 0) and (b == 0) and (c != 0) and ((-c//a) > 0):
+		text.configure(state = NORMAL)
 		text.insert("1.0", "Вы ввели неполное квадратное уравнение.")
 		text.insert(END, "\nНажмите на кнопку «Неполное», чтобы увидеть решение.")
+		text.configure(state = DISABLED)
 		Button(window, state = NORMAL, width = 10, text = "Неполное", command = lambda: nepolnoe()).grid(row = 4, column = 0, sticky = SW, padx = 950, pady = 10)
+
+#ax² + bx = 0
+		
 	if (a != 0) and (b != 0) and (c == 0):
+		text.configure(state = NORMAL)
 		text.insert("1.0", "Вы ввели неполное квадратное уравнение.")
 		text.insert(END, "\nНажмите на кнопку «Неполное», чтобы увидеть решение.")
+		text.configure(state = DISABLED)
 		Button(window, state = NORMAL, width = 10, text = "Неполное", command = lambda: nepolnoe()).grid(row = 4, column = 0, sticky = SW, padx = 950, pady = 10)
+
+#ax² = 0
+
 	if (a != 0) and (b == 0) and (c == 0):
+		text.configure(state = NORMAL)
 		text.insert("1.0", "Вы ввели неполное квадратное уравнение.")
 		text.insert(END, "\nНажмите на кнопку «Неполное», чтобы увидеть решение.")
+		text.configure(state = DISABLED)
 		Button(window, state = NORMAL, width = 10, text = "Неполное", command = lambda: nepolnoe()).grid(row = 4, column = 0, sticky = SW, padx = 950, pady = 10)
 		
+#Ошибка при вводе a = 0
+
 	if (a == 0):
+		text.configure(state = NORMAL)
 		text.delete("1.0", END)
+		text.configure(state = DISABLED)
 		answer = mb.showerror(title = "Ошибка" , message ="Коэффициент a не может быть равен нулю!")
+		
+#Отрицательный дискриминант
+
 	if d < 0 and (a != 0) and (b != 0) and (c != 0):
+		text.configure(state = NORMAL)
 		text.delete("1.0", END)
 		text.insert("1.0", "D = b² - 4ac = " +str(round(b*b)) + " - 4 × " + str(round(a)) +" × " + str(round(c)) + " = " + str("%.2f"%(d)) + ", D < 0, нет корней")
+		text.configure(state = DISABLED)
+
+#Блокировка кнопки, если уравнение ax² + c = 0 не имеет корней
 		
 	if (b == 0) and (a !=0) and (c != 0) and ((-c / a) < 0) and (a > 0) and (c > 0):
 		Button(window, state = DISABLED, width = 10, text = "Неполное", command = lambda: nepolnoe()).grid(row = 4, column = 0, sticky = SW, padx = 950, pady = 10)
+		
+#Вывод данных, когда уравнение ax² + c = 0 не имеет корней (случай с а = 1)
+
+	if (a == 1) and (c != 0) and (c > 0) and (b == 0):
+		text.configure(state = NORMAL)
+		text.insert("1.0", "x²" + " + " + str(round(c)) + " = 0")
+		text.insert(END, "\nx² = " + str("%.2f"%(-c//a)))
+		text.insert(END, "\nНет корней")
+		text.configure(state = DISABLED)
+		
+#Если уравнение ax² + c = 0 не имеет корней (общий случай)		
+
+	if (a != 1) and (a > 0) and (c != 0) and (c > 0) and (b == 0):
+		text.configure(state = NORMAL)
 		text.insert("1.0", str(round(a)) + "x²" + " + " + str(round(c)) + " = 0")
 		text.insert(END, "\nx² = " + str(round(-c)) + " / " + str(round(a)))
 		text.insert(END, "\nx² = " + str("%.2f"%(-c//a)))
 		text.insert(END, "\nНет корней")
+		text.configure(state = DISABLED)
+
+#Случай, когда a < 0 и c < 0	
+	
 	if (b == 0) and (a !=0) and (c != 0) and ((-c / a) < 0) and (a < 0) and (c < 0):
 		Button(window, state = DISABLED, width = 10, text = "Неполное", command = lambda: nepolnoe()).grid(row = 4, column = 0, sticky = SW, padx = 950, pady = 10)
+		
+#Вывод для a = -1
+
+	if (a == - 1) and (c < 0):
+		text.insert("1.0", "-x²" + " - " + str(round(-c)) + " = 0")
+		text.insert(END, "\n-x² = " + str("%.2f"%(c//a)) + " | × (-1)")
+		text.insert(END, "\nx² = " + str("%.2f"%(-c//a)))
+		text.insert(END, "\nНет корней")
+		text.configure(state = DISABLED)
+
+#Общий случай
+		
+	if (a < 0) and (c < 0) and (a != -1):
+		text.configure(state = NORMAL)
 		text.insert("1.0", str(round(a)) + "x²" + " - " + str(round(-c)) + " = 0")
 		text.insert(END, "\nx² = " + str(round(-c)) + " / " + str(round(a)))
 		text.insert(END, "\nx² = " + str("%.2f"%(-c//a)))
 		text.insert(END, "\nНет корней")
+		text.configure(state = DISABLED)
+		
+#Алгоритм для дискриминанта
 			
 def discr():
 	Button(window, state = DISABLED, width = 10, text = "D", command = lambda: discr()).grid(row = 1, column = 0, sticky = SW, padx = 810, pady = 10)
+	text.configure(state = NORMAL)
 	text.delete("1.0", END)
 	a = float(a1.get())
 	b = float(b1.get())
@@ -131,9 +234,13 @@ def discr():
 	    text.insert(END, "\nПо формуле корней квадратного уравнения: ")
 	    text.insert(END, "\nx1 = (-b + √D) / 2a = (" + str(round(-b)) + " + " + str(round(math.sqrt(d))) + ") / " + str(round(2*a)) + " = " + str("%.2f"%(x1)))
 	    text.insert(END, "\nx2 = (-b - √D) / 2a = (" + str(round(-b)) + " - " + str(round(math.sqrt(d))) + ") / " + str(round(2*a)) + " = " + str("%.2f"%(x2)))
+	    text.configure(state = DISABLED)
+
+#Алгоритм для половины коэффициента
 		
 def halfcoef():
      	Button(window, state = DISABLED, width = 10, text = "D/4", command = lambda: halfcoef()).grid(row = 1, column = 0, sticky = SW, padx = 1090, pady = 10)
+     	text.configure(state = NORMAL)
      	text.delete("1.0", END)
      	a = float(a1.get())
      	b = float(b1.get())
@@ -147,9 +254,13 @@ def halfcoef():
      		text.insert(END, "\nПо формуле корней для чётного коэффициента b: ")
      		text.insert(END, "\nx1 = (-k + √D) / a = (" + str(round(-k)) + " + " + str(round(math.sqrt(d))) + ") / " + str(round(a)) + " = " + str("%.2f"%(x1)))
      		text.insert(END, "\nx2 = (-k - √D) / a = (" + str(round(-k)) + " - " + str(round(math.sqrt(d))) + ") / " + str(round(a)) + " = " + str("%.2f"%(x2)))
-     		
+     		text.configure(state = DISABLED)
+   
+#Алгортим для теоремы Виета
+  		
 def Viet():
 	Button(window, state = DISABLED, width = 10, text = "Теорема Виета", command = lambda: Viet()).grid(row = 2, column = 0, sticky = SW, padx = 810, pady = 10)
+	text.configure(state = NORMAL)
 	text.delete("1.0", END)
 	a = float(a1.get())
 	b = float(b1.get())
@@ -165,11 +276,16 @@ def Viet():
 				q = (x1 * x2)
 				if (p == -b) and (q == c) and (x1 != x2):
 					text.insert(END, "\nx1 = " + str(x1) + ", x2 = " + str(x2))
+					text.configure(state = DISABLED)
 				if (p == -b) and (q == c) and (x1 == x2):
+					text.configure(state = NORMAL)
 					text.insert(END, "\nx1 = x2 = " + str(x1))
-											
+					text.configure(state = DISABLED)
+
+#Алгортим для метода переброски									
 def perebros():
 	Button(window, state = DISABLED, width = 10, text = "Переброска", command = lambda: perebros()).grid(row = 2, column = 0, sticky = SW, padx = 1090, pady = 10)
+	text.configure(state = NORMAL)
 	text.delete("1.0", END)
 	a = float(a1.get())
 	b = float(b1.get())
@@ -185,11 +301,17 @@ def perebros():
 			   q = (x1 * x2)
 			   if (p == -b) and (q == c * a) and (x1 != x2):
 			   	text.insert(END, "\nx1 = " + str(round(x1)) + " / " + str(round(a)) + " = " + str("%.2f"%(x1/a)) + ", x2 = " + str(round(x2)) + " / " + str(round(a)) + " = " + str("%.2f"%(x2/a)))
+			   	text.configure(state = DISABLED)
 			   if (p == -b) and (q == c * a) and (x1 == x2):
+			   			   text.configure(state = NORMAL)
 			   			   text.insert(END, "\nx1 = x2 = " + str(round(x1)) + " / " + str(round(a)) + " = " + str("%.2f"%(x1/a)))
+			   			   text.configure(state = DISABLED)
+
+#Алгортим для свойства коэффициентов
 			   			   
 def svoistva():
     Button(window, state = DISABLED, width = 10, text = "a + b + c = 0", command = lambda: svoistva()).grid(row = 3, column = 0, sticky = SW, padx = 810, pady = 10)
+    text.configure(state = NORMAL)
     text.delete("1.0", END)
     a = float(a1.get())
     b = float(b1.get())
@@ -208,9 +330,13 @@ def svoistva():
     		text.insert("1.0", "Так как a - b + c = 0, то:")
     		text.insert(END, "\nx1 = " + str("%.2f"%(x1)))
     		text.insert(END, "\nx2 = -c / a = " + str("%.2f"%(-c/a)))
+    		text.configure(state = DISABLED)
+
+#Алгортим для схемы Горнера
     		
 def Gorner():
 	Button(window, state = DISABLED, width = 10, text = "Схема Горнера", command = lambda: Gorner()).grid(row = 3, column = 0, sticky = SW, padx = 1090, pady = 10)
+	text.configure(state = NORMAL)
 	text.delete("1.0", END)
 	a = float(a1.get())
 	b = float(b1.get())
@@ -223,86 +349,306 @@ def Gorner():
 			c2 = ((b2 * f) + c)
 			if c2 == 0:
 				text.insert(END, "\n| " + str(round(a)) + " | " + str(round(b2)) + " | " + str(round(c2)) + " |" + " при х = " + str("%.2f"%(f)))
-				
+	
+#Алгоритм для решения неполных квадратных уравнений
+						
 def nepolnoe():
 	Button(window, state = DISABLED, width = 10, text = "Неполное", command = lambda: nepolnoe()).grid(row = 4, column = 0, sticky = SW, padx = 950, pady = 10)
+	text.configure(state = NORMAL)
 	text.delete("1.0", END)
 	a = float(a1.get())
 	b = float(b1.get())
 	c = float(c1.get())
 	
+#ах² + с = 0, когда а = 1
+	
 	if (b == 0) and (a !=0) and (c != 0) and ((-c / a) >= 0) and (a > 0):
-		x1 = -(math.sqrt(-(c/a)))
-		x2 = math.sqrt(-(c/a))
-		text.insert("1.0", str(round(a)) + "x²" + " - " +str(round(-c)) + " = 0")
-		text.insert(END, "\nx² = " + str(round(-c)) + " / " + str(round(a))) 
-		text.insert(END, "\nx² = " + str("%.2f"%(-c//a)))
-		text.insert(END, "\nx1 = " + str("%.2f"%(x1)) + ", x2 = " + str("%.2f"%(x2)))
+		if (a == 1) and (c != 0):
+			x1 = -(math.sqrt(-(c/a)))
+			x2 = math.sqrt(-(c/a))
+			text.configure(state = NORMAL)
+			text.insert("1.0", "x²" + " - " +str(round(-c)) + " = 0")
+			text.insert(END, "\nx² = " + str("%.2f"%(-c//a)))
+			text.insert(END, "\nx1 = " + str("%.2f"%(x1)) + ", x2 = " + str("%.2f"%(x2)))
+			text.configure(state = DISABLED)
+	
+#ах² + с = 0, общий случай, а > 0
+
+		if (a > 0) and (a != 1) and (c != 0):
+			x1 = -(math.sqrt(-(c/a)))
+			x2 = math.sqrt(-(c/a))
+			text.configure(state = NORMAL)
+			text.insert("1.0", str(round(a)) + "x²" + " - " +str(round(-c)) + " = 0")
+			text.insert(END, "\nx² = " + str(round(-c)) + " / " + str(round(a))) 
+			text.insert(END, "\nx² = " + str("%.2f"%(-c//a)))
+			text.insert(END, "\nx1 = " + str("%.2f"%(x1)) + ", x2 = " + str("%.2f"%(x2)))
+			text.configure(state = DISABLED)
+
+#ах² + с = 0, когда а = -1
 		
 	if (b == 0) and (a !=0) and (c != 0) and ((-c / a) >= 0) and (a < 0):
+		if (a == -1) and (c != 0):
+			x1 = -(math.sqrt(-(c/a)))
+			x2 = math.sqrt(-(c/a))
+			text.configure(state = NORMAL)
+			text.insert("1.0", "-x²" + " + " +str(round(c)) + " = 0")
+			text.insert(END, "\n-x² = " + str("%.2f"%(-c)) + " | × (-1)") 
+			text.insert(END, "\nx² = " + str("%.2f"%(-c//a)))
+			text.insert(END, "\nx1 = " + str("%.2f"%(x1)) + ", x2 = " + str("%.2f"%(x2)))
+			text.configure(state = DISABLED)
+
+#ах² + с = 0, случай для a < 0	
+	
+	if (a < 0) and (a != -1) and (c != 0):
 		x1 = -(math.sqrt(-(c/a)))
 		x2 = math.sqrt(-(c/a))
+		text.configure(state = NORMAL)
 		text.insert("1.0", str(round(a)) + "x²" + " + " +str(round(c)) + " = 0")
 		text.insert(END, "\nx² = " + str(round(-c)) + " / " + str(round(a))) 
 		text.insert(END, "\nx² = " + str("%.2f"%(-c//a)))
 		text.insert(END, "\nx1 = " + str("%.2f"%(x1)) + ", x2 = " + str("%.2f"%(x2)))
+		text.configure(state = DISABLED)
 
-	if (c == 0) and (b != 0) and (a != 0) and (b > 0) and (a > 0):
+#ax² + bx = 0, a > 0, b > 0
+
+	if (c == 0) and (b != 0) and (a != 0) and (b > 0) and (a > 0) and (a != 1) and (b != 1):
 		x1 = 0
 		x2 =(-b/a)
+		text.configure(state = NORMAL)
 		text.insert("1.0", str(round(a)) + "x² + " + str(round(b)) + "x = 0")
 		text.insert(END, "\n" + str(round(a)) + "x × (x + " + str(round(b/a)) + ") = 0")
 		text.insert(END, "\n" + str(round(a)) + "x = 0, (x + " + str(round(b/a)) + ") = 0")
 		text.insert(END, "\nx1 = 0, x2 = " + str(str("%.2f"%(-b/a))))
+		text.configure(state = DISABLED)
 		
-	if (c == 0) and (b != 0) and (a != 0) and (a > 0) and (b < 0):
-		x1 = 0
-		x2 =(-b/a)
-		text.insert("1.0", str(round(a)) + "x² - " + str(round(-b)) + "x = 0")
-		text.insert(END, "\n" + str(round(a)) + "x × (x - " + str(round(-b/a)) + ") = 0")
-		text.insert(END, "\n" + str(round(a)) + "x = 0, (x - " + str(round(-b/a)) + ") = 0")
+#ax² + bx = 0, a > 0, b > 0, a = 1, b != 1
+		
+	if (a == 1) and (b > 0) and (b != 1):
+		text.configure(state = NORMAL)
+		text.insert("1.0", "x² + " + str(round(b)) + "x = 0")
+		text.insert(END, "\n" + "x × (x + " + str(round(b/a)) + ") = 0")
+		text.insert(END, "\n" + "x = 0, (x + " + str(round(b/a)) + ") = 0")
 		text.insert(END, "\nx1 = 0, x2 = " + str(str("%.2f"%(-b/a))))
+		text.configure(state = DISABLED)
 
-	if (c == 0) and (b != 0) and (a != 0) and (a  < 0) and (b < 0):
-		x1 = 0
-		x2 =(-b/a)
-		text.insert("1.0", str(round(a)) + "x² - " + str(round(-b)) + "x = 0")
-		text.insert(END, "\n" + str(round(a)) + "x × (x + " + str(round(b/a)) + ") = 0")
-		text.insert(END, "\n" + str(round(a)) + "x = 0, (x + " + str(round(b/a)) + ") = 0")
-		text.insert(END, "\nx1 = 0, x2 = " + str(str("%.2f"%(-b/a))))
+#ax² + bx = 0, a > 0, b > 0, a != 1, b = 1
 		
-	if (c == 0) and (b != 0) and (a != 0) and (a < 0) and (b > 0):
+	if (a != 1) and (a > 0) and (b == 1):
 		x1 = 0
 		x2 =(-b/a)
-		text.insert("1.0", str(round(a)) + "x² + " + str(round(b)) + "x = 0")
-		text.insert(END, "\n" + str(round(a)) + "x × (x - " + str(round(-b/a)) + ") = 0")
-		text.insert(END, "\n" + str(round(a)) + "x = 0, (x - " + str(round(-b/a)) + ") = 0")
+		text.configure(state = NORMAL)
+		text.insert("1.0", str(round(a)) + "x² + " + "x = 0")
+		text.insert(END, "\n" + str(round(a)) + "x × (x + " + str("%.1f"%(b/a)) + ") = 0")
+		text.insert(END, "\n" + str(round(a)) + "x = 0, (x + " + str("%.1f"%(b/a)) + ") = 0")
+		text.insert(END, "\nx1 = 0, x2 = " + str(str("%.1f"%(-b/a))))
+		text.configure(state = DISABLED)
+		
+#ax² + bx = 0, a > 0, b < 0, a == 1, b = -1
+
+	if (c == 0) and (b != 0) and (a != 0) and (a > 0) and (b < 0): 
+		if (a == 1) and (b == -1):
+			x1 = 0
+			x2 =(-b/a)
+			text.configure(state = NORMAL)
+			text.insert("1.0", "x² - " + "x = 0")
+			text.insert(END, "\n" +  "x × (x - " + str(round(-b/a)) + ") = 0")
+			text.insert(END, "\n" + "x = 0, (x - " + str(round(-b/a)) + ") = 0")
+			text.insert(END, "\nx1 = 0, x2 = " + str(str("%.2f"%(-b/a))))
+			text.configure(state = DISABLED)
+	
+#ax² + bx = 0, a > 0, b < 0, a == 1, b != -1
+
+	if (a == 1) and (b < 0) and (b != -1): 
+			x1 = 0
+			x2 =(-b/a)
+			text.configure(state = NORMAL)
+			text.insert("1.0", "x² - " + str(round(-b)) + "x = 0")
+			text.insert(END, "\n"  + "x × (x - " + str(round(-b/a)) + ") = 0")
+			text.insert(END, "\n" + "x = 0, (x - " + str(round(-b/a)) + ") = 0")
+			text.insert(END, "\nx1 = 0, x2 = " + str(str("%.2f"%(-b/a))))
+			text.configure(state = DISABLED)
+
+#ax² + bx = 0, a > 0, b < 0, a != 1, b = -1
+						
+	if (a != 1) and (a > 0) and (b == -1):
+			x1 = 0 
+			x2 =(-b/a)
+			text.configure(state = NORMAL)
+			text.insert("1.0", str(round(a)) + "x² " + "- x = 0")
+			text.insert(END, "\n" + str(round(a)) + "x × (x - " + str("%.1f"%(-b/a)) + ") = 0")
+			text.insert(END, "\n" + str(round(a)) + "x = 0, (x - " + str("%.1f"%(-b/a)) + ") = 0")
+			text.insert(END, "\nx1 = 0, x2 = " + str(str("%.1f"%(-b/a))))
+			text.configure(state = DISABLED)
+
+#ax² + bx = 0, a > 0, b < 0, a != 1, b != -1
+
+	if (a != 1) and (a > 0) and (b < 0) and (b != -1):
+			x1 = 0
+			x2 =(-b/a)
+			text.configure(state = NORMAL)
+			text.insert("1.0", str(round(a)) + "x² - " + str(round(-b)) + "x = 0")
+			text.insert(END, "\n" + str(round(a)) + "x × (x - " + str(round(-b/a)) + ") = 0")
+			text.insert(END, "\n" + str(round(a)) + "x = 0, (x - " + str(round(-b/a)) + ") = 0")
+			text.insert(END, "\nx1 = 0, x2 = " + str(str("%.2f"%(-b/a))))
+			text.configure(state = DISABLED)
+
+#ax² + bx = 0, a < 0, b < 0, a != -1, b != -1
+			
+	if (c == 0) and (b != 0) and (a != 0) and (a  < 0) and (b < 0) and (a != -1) and (b != -1): 
+		x1 = 0
+		x2 =(-b/a)
+		text.configure(state = NORMAL)
+		text.insert("1.0", str(round(a)) + "x² - " + str(round(-b)) + "x = 0 | × (-1)")
+		text.insert(END, "\n" + str(round(-a)) + "x × (x + " + str(round(b/a)) + ") = 0")
+		text.insert(END, "\n" + str(round(-a)) + "x = 0, (x + " + str(round(b/a)) + ") = 0")
 		text.insert(END, "\nx1 = 0, x2 = " + str(str("%.2f"%(-b/a))))
-	if (b == 0) and (c == 0) and (a != 0):
-			text.insert("1.0", str(round(a)) + "x² = 0")
-			text.insert(END, "\nx = 0")
+		text.configure(state = DISABLED)
+
+#ax² + bx = 0, a < 0, b < 0, a == -1, b == -1
+		
+	if (c == 0) and (b != 0) and (a != 0) and (a  < 0) and (b < 0) and (a == -1) and (b == -1): 
+		x1 = 0
+		x2 =(-b/a)
+		text.configure(state = NORMAL)
+		text.insert("1.0", "-x² - " + "x = 0 | × (-1)")
+		text.insert(END, "\n" + "x × (x + " + str(round(b/a)) + ") = 0")
+		text.insert(END, "\n" + "x = 0, (x + " + str(round(b/a)) + ") = 0")
+		text.insert(END, "\nx1 = 0, x2 = " + str(str("%.2f"%(-b/a))))
+		text.configure(state = DISABLED)
+		
+#ax² + bx = 0, a > 0, b > 0, a == 1 b == 1
+
+	if (c == 0) and (a == 1) and (b == 1): 
+		text.configure(state = NORMAL)
+		text.insert("1.0", "x² + " + "x = 0")
+		text.insert(END, "\n" + "x × (x + " + str(round(b/a)) + ") = 0")
+		text.insert(END, "\n" + "x = 0, (x + " + str(round(b/a)) + ") = 0")
+		text.insert(END, "\nx1 = 0, x2 = " + str(str("%.2f"%(-b/a))))
+		text.configure(state = DISABLED)
+
+#ax² + bx = 0, a < 0, b > 0, a != -1, b != 1
+
+	if (c == 0) and (b != 0) and (a != 0) and (a < 0) and (b > 0) and (a != -1) and (b != 1): 
+		x1 = 0
+		x2 =(-b/a)
+		text.configure(state = NORMAL)
+		text.insert("1.0", str(round(a)) + "x² + " + str(round(b)) + "x = 0 | × (-1)")
+		text.insert(END, "\n" + str(round(-a)) + "x × (x - " + str(round(-b/a)) + ") = 0")
+		text.insert(END, "\n" + str(round(-a)) + "x = 0, (x - " + str(round(-b/a)) + ") = 0")
+		text.insert(END, "\nx1 = 0, x2 = " + str(str("%.2f"%(-b/a))))
+		text.configure(state = DISABLED)
+
+#ax² + bx = 0, a < 0, b > 0, a != -1, b == 1
+		
+	if (c == 0) and (b != 0) and (a != 0) and (a < 0) and (b > 0) and (a != -1) and (b == 1): 
+		x1 = 0
+		x2 =(-b/a)
+		text.configure(state = NORMAL)
+		text.insert("1.0", str(round(a)) + "x² + " + "x = 0 | × (-1)")
+		text.insert(END, "\n" + str(round(-a)) + "x × (x - " + str("%.1f"%(-b/a)) + ") = 0")
+		text.insert(END, "\n" + str(round(-a)) + "x = 0, (x - " + str("%.1f"%(-b/a)) + ") = 0")
+		text.insert(END, "\nx1 = 0, x2 = " + str(str("%.1f"%(-b/a))))
+		text.configure(state = DISABLED)
+		
+#ax² + bx = 0, a < 0, b > 0, a == -1, b != 1,b > 0
+		
+	if (c == 0) and (b != 0) and (a != 0) and (a < 0) and (b > 0) and (a == -1) and (b != 1): 
+		x1 = 0
+		x2 =(-b/a)
+		text.configure(state = NORMAL)
+		text.insert("1.0", "-x² + " + str(round(b)) + "x = 0 | × (-1)")
+		text.insert(END, "\n" + "x × (x - " + str(round(-b/a)) + ") = 0")
+		text.insert(END, "\n" + "x = 0, (x - " + str(round(-b/a)) + ") = 0")
+		text.insert(END, "\nx1 = 0, x2 = " + str(str("%.2f"%(-b/a))))
+		text.configure(state = DISABLED)
+		
+#ax² + bx = 0, a < 0, b > 0, a == -1, b != 1,b < 0
+
+	if (a == -1) and (b != 1) and (b !=0) and (b != -1) and (b < 0): 
+		x1 = 0
+		x2 =(-b/a)
+		text.configure(state = NORMAL)
+		text.insert("1.0", "-x² - " + str(round(-b)) + "x = 0 | × (-1)")
+		text.insert(END, "\n" + "x × (x + " + str(round(b/a)) + ") = 0")
+		text.insert(END, "\n" + "x = 0, (x + " + str(round(b/a)) + ") = 0")
+		text.insert(END, "\nx1 = 0, x2 = " + str(str("%.2f"%(-b/a))))
+		text.configure(state = DISABLED)
+		
+#ax² + bx = 0, a < 0, b > 0, a != -1, b == -1
+
+	if (a != 1) and (a != -1) and (a < 0) and (b == -1): 
+		x1 = 0
+		x2 =(-b/a)
+		text.configure(state = NORMAL)
+		text.insert("1.0", str(round(a)) + "x² - " + "x = 0 | × (-1)")
+		text.insert(END, "\n" + str(round(-a)) + "x × (x + " + str("%.1f"%(b/a)) + ") = 0")
+		text.insert(END, "\n" + str(round(-a))+ "x = 0, (x + " + str("%.1f"%(b/a)) + ") = 0")
+		text.insert(END, "\nx1 = 0, x2 = " + str(str("%.1f"%(-b/a))))
+		text.configure(state = DISABLED)
+
+#ax² + bx = 0, a < 0, b > 0, a == -1, b == 1
+		
+	if (a == -1) and (b == 1) and (b != 0):
+		x1 = 0
+		x2 =(-b/a)
+		text.configure(state = NORMAL)
+		text.insert("1.0", "-x² + " + "x = 0 | × (-1)")
+		text.insert(END, "\n" + "x × (x - " + str(round(-b/a)) + ") = 0")
+		text.insert(END, "\n" + "x = 0, (x - " + str(round(-b/a)) + ") = 0")
+		text.insert(END, "\nx1 = 0, x2 = " + str(str("%.2f"%(-b/a))))
+		text.configure(state = DISABLED)
+
+#ax² = 0, общий случай
+		
+	if (a != 0) and(b == 0) and (c == 0) and (a != 1) and (a != -1):
+		text.configure(state = NORMAL)
+		text.insert("1.0", str(round(a)) + "x² = 0")
+		text.insert(END, "\nx = 0")
+		text.configure(state = DISABLED)
+		
+#ах² = 0, а = 1
+		
+	if (a == 1) and (a != 0) and(b == 0) and (c == 0):
+		text.configure(state = NORMAL)
+		text.insert("1.0", "x² = 0")
+		text.insert(END, "\nx = 0")
+		text.configure(state = DISABLED)
+		
+#ах² = 0, а = -1
+
+	if (a == -1) and (a != 0) and (b == 0) and (c == 0):
+		text.configure(state = NORMAL)
+		text.insert("1.0", "-x² = 0")
+		text.insert(END, "\nx = 0")
+		text.configure(state = DISABLED)
+	
+#Графический интерфейс
 		
 window = Tk()
 
 window.title("Программа")
 menubar = Menu(window)
 
+#Меню
+
 helpmenu = Menu(menubar, tearoff=0)
 menubar.add_cascade(label="Справка", menu=helpmenu)
 
 menubar.add_command(label="Выйти", command=exit)
 
-helpmenu.add_command(label="Как пользоваться программой?", command=how_to_use)
+helpmenu.add_command(label="Инструкция", command=how_to_use)
 
 helpmenu2 = Menu(helpmenu, tearoff=0)
 helpmenu2.add_command(
-    label="Как вводить данные?", command = entry_rules)
+    label="Правила ввода", command = entry_rules)
 helpmenu2.add_command(
     label="Примеры", command = examples)
  
 helpmenu.add_cascade(label="Ввод данных", menu = helpmenu2)
 
 window.config(menu=menubar)
+
+#Надписи
 
 l1 = Label(window, text="Введите значения коэффициентов: ")
 l1.grid(row = 0, column = 0, sticky = NW, padx = 10, pady = 10)
@@ -322,6 +668,8 @@ l5.grid(row = 3, column = 0, sticky = NW, padx = 10, pady = 10)
 l6 = Label(window, text = "Решение")
 l6.grid(row = 4, column = 0, sticky = SW, pady = 10, padx = 623)
 
+#Поля ввода коэффициентов
+
 a1 = Entry(window, width = 14, justify = CENTER)
 a1.focus()
 a1.grid(row = 1, column = 0, sticky = NW, padx = 300, pady = 10)
@@ -332,8 +680,14 @@ b1.grid(row = 2, column = 0, sticky = NW, padx = 300, pady = 10)
 c1 = Entry(window, width = 14, justify = CENTER)
 c1.grid(row = 3, column = 0, sticky = NW, padx = 300, pady = 10)
 
+#Текстовый виджет для вывода данных
+
 text = Text(width = 62, height = 4)
 text.grid(row = 6, column = 0, padx = 160,pady = 10, sticky = NW)
+text.insert("1.0", "Здравствуйте! Перед тем, как начать работу программы, нажмите на кнопку «Справка» в строке меню и ознакомьтесь с инструкцией\nи правилами ввода.")
+text.configure(state = DISABLED)
+
+#Кнопки
 
 Button(window, width = 5, text = "Готово", command = lambda: ready()).grid(row = 4, column = 0, sticky = NW, padx = 170, pady = 10)
 
