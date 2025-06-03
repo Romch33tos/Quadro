@@ -2,8 +2,26 @@ from tkinter import *
 from tkinter import messagebox as mb
 import math
 
+def clear_all():
+	answer = mb.askyesno( title="Очистить данные", message="Вы действительно хотите очистить все данные?")
+	if answer == True:
+		text.delete("1.0", END)
+		a1.delete(0, END)
+		b1.delete(0, END)
+		c1.delete(0, END)
+		a1.focus()
+		Button(window, state = DISABLED, width = 10, text = "D", command = lambda: discr()).grid(row = 1, column = 0, sticky = SW, padx = 810, pady = 10)
+		Button(window, state = DISABLED, width = 10, text = "D/4", command = lambda: halfcoef()).grid(row = 1, column = 0, sticky = SW, padx = 1090, pady = 10)
+		Button(window, state = DISABLED, width = 10, text = "Теорема Виета", command = lambda:Viet()).grid(row = 2, column = 0, sticky = SW, padx = 810, pady = 10)
+		Button(window, state = DISABLED, width = 10, text = "Переброска", command = lambda: perebros()).grid(row = 2, column = 0, sticky = SW, padx = 1090, pady = 10)
+		Button(window, state = DISABLED, width = 10, text = "a + b + c = 0", command = lambda: svoistva()).grid(row = 3, column = 0, sticky = SW, padx = 810, pady = 10)
+		Button(window, state = DISABLED, width = 10, text = "Схема Горнера", command = lambda: Gorner()).grid(row = 3, column = 0, sticky = SW, padx = 1090, pady = 10)
+		Button(window, state = DISABLED, width = 10, text = "Неполное", command = lambda: nepolnoe()).grid(row = 4, column = 0, sticky = SW, padx = 950, pady = 10)
+	else:
+		pass
+	
 def how_to_use():
-	answer = mb.showinfo(title = "Справка", message = "Инструкция:", detail = "1. Введите коэффициенты уравнения, следуя правилам ввода данных.\n2. Нажмите на кнопку «Готово».\n3. Выберите интересующий вас способ решения.\n4. Чтобы завершить работу программы, нажмите на кнопку «Выйти»\nв верхней панели меню.")
+	answer = mb.showinfo(title = "Справка", message = "Инструкция:", detail = "1. Введите коэффициенты уравнения, следуя правилам ввода данных.\n2. Нажмите на кнопку «Готово». \n3. Выберите интересующий вас способ решения.\n4. Если вы хотите очистить данные, нажмите на кнопку «CLR».\n5. Чтобы завершить работу программы, нажмите на кнопку «Выйти»\nв верхней панели меню.")
 	
 def entry_rules():
  	answer = mb.showinfo(title = "Справка", message = "Правила ввода:", detail = "1. Поле ввода не должно содержать лишних символов, кроме числового\nзначения коэффициента.\n2. Нельзя оставлять поле ввода пустым. Если один из коэффициентов\nотсутствует, вместо него нужно ввести 0. При этом, коэффициент а ≠ 0!\n3. Если перед х² или х отсутствует числовое значение, то это значит, что\nкоэффициент равен 1.")
@@ -165,8 +183,7 @@ def perebros():
 			   q = (x1 * x2)
 			   if (p == -b) and (q == c * a) and (x1 != x2):
 			   	text.insert(END, "\nx1 = " + str(round(x1)) + " / " + str(round(a)) + " = " + str("%.2f"%(x1/a)) + ", x2 = " + str(round(x2)) + " / " + str(round(a)) + " = " + str("%.2f"%(x2/a)))
-			   	
-			   
+			   			   
 def svoistva():
     Button(window, state = DISABLED, width = 10, text = "a + b + c = 0", command = lambda: svoistva()).grid(row = 3, column = 0, sticky = SW, padx = 810, pady = 10)
     text.delete("1.0", END)
@@ -314,7 +331,9 @@ c1.grid(row = 3, column = 0, sticky = NW, padx = 300, pady = 10)
 text = Text(width = 62, height = 4)
 text.grid(row = 6, column = 0, padx = 160,pady = 10, sticky = NW)
 
-Button(window, width = 10, text = "Готово", command = lambda: ready()).grid(row = 4, column = 0, sticky = NW, padx = 170, pady = 10)
+Button(window, width = 5, text = "Готово", command = lambda: ready()).grid(row = 4, column = 0, sticky = NW, padx = 170, pady = 10)
+
+Button(window, width = 1, text = "CLR", command = lambda:clear_all()).grid(row = 4, column = 0, sticky = NW, padx = 340, pady = 10)
 
 Button(window, state = DISABLED, width = 10, text = "D", command = lambda: discr()).grid(row = 1, column = 0, sticky = SW, padx = 810, pady = 10)
 
