@@ -6,6 +6,7 @@ root.title("Программа")
 txt = StringVar()
 txt2 = StringVar()
 txt3 = StringVar()
+txt4 = StringVar()
 def clicked():
 	a = float(a1.get())
 	b = float(b1.get())
@@ -21,7 +22,7 @@ def clicked():
 		title="Способы решения",message="Уравнение можно решить через дискриминант" )
 		Button(root, state = DISABLED,text="Решить через половину коэффициента", command=lambda: clicked3()).grid(row=5,column=0)
 		Button(root, state = NORMAL, text="Решить через дискриминант", command=lambda: clicked2()).grid(row=5,column=1)
-    	    
+		
 def clicked2():
     Button(root, state = DISABLED, text="Решить через дискриминант", command=lambda: clicked2()).grid(row=5, column=1)
     a = float(a1.get())
@@ -32,8 +33,12 @@ def clicked2():
      x1 = ((-b + d**0.5) / (2*a))
      x2 = ((-b - d**0.5) / (2*a))
      txt.set("%.2f"%(d))
-     txt2.set("%.2f"%(x1))
-     txt3.set("%.2f"%(x2))
+     if d > 0:
+     	txt2.set("Уравнение имеет два различных корня")
+     if d == 0:
+     	txt2.set("Уравнение имеет два одинаковых корня")
+     txt3.set("%.2f"%(x1))
+     txt4.set("%.2f"%(x2))
     else:
      Button(root, state = DISABLED, text="Решить через дискриминант", command=lambda: clicked2()).grid(row=5, column=1)
      txt.set("%.2f"%(d))
@@ -49,8 +54,12 @@ def clicked3():
      x1 = ((-k + d**0.5)/ a)
      x2 = ((-k - d**0.5)/ a)
      txt.set("%.2f"%(d))
-     txt2.set("%.2f"%(x1))
-     txt3.set("%.2f"%(x2))
+     if d > 0:
+      	txt2.set("Уравнение имеет два различных корня")
+     if d == 0:
+     	txt2.set("Уравнение имеет два одинаковых корня")
+     txt3.set("%.2f"%(x1))
+     txt4.set("%.2f"%(x2))
     else:
      Button(root, state = DISABLED, text="Решить через половину коэффициента", command=lambda: clicked3()).grid(row=5, column=0)
      txt.set("%.2f"%(d))
@@ -86,16 +95,19 @@ dis.grid(row=6, column=1)
 l6 = Label(root, text="Корни уравнения: ")
 l6.grid(row=7, column=0)
 
+sol = Label(root, textvariable = txt2)
+sol.grid(row=7, column=1)
+
 l7 = Label(root, text="x1 =")
 l7.grid(row=8, column=0)
 
 l8 = Label(root, text="x2 =")
 l8.grid(row=9, column=0)
 
-x1 = Entry(root, textvariable=txt2)
+x1 = Entry(root, textvariable=txt3)
 x1.grid(row=8, column=1)
 
-x2 = Entry(root, textvariable=txt3)
+x2 = Entry(root, textvariable=txt4)
 x2.grid(row=9, column=1)
 
 Button(root, text="Готово", command=lambda: clicked()).grid(row=4, column=1)
