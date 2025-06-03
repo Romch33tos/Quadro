@@ -165,6 +165,8 @@ def Viet():
 				q = (x1 * x2)
 				if (p == -b) and (q == c) and (x1 != x2):
 					text.insert(END, "\nx1 = " + str(x1) + ", x2 = " + str(x2))
+				if (p == -b) and (q == c) and (x1 == x2):
+					text.insert(END, "\nx1 = x2 = " + str(x1))
 											
 def perebros():
 	Button(window, state = DISABLED, width = 10, text = "Переброска", command = lambda: perebros()).grid(row = 2, column = 0, sticky = SW, padx = 1090, pady = 10)
@@ -183,6 +185,8 @@ def perebros():
 			   q = (x1 * x2)
 			   if (p == -b) and (q == c * a) and (x1 != x2):
 			   	text.insert(END, "\nx1 = " + str(round(x1)) + " / " + str(round(a)) + " = " + str("%.2f"%(x1/a)) + ", x2 = " + str(round(x2)) + " / " + str(round(a)) + " = " + str("%.2f"%(x2/a)))
+			   if (p == -b) and (q == c * a) and (x1 == x2):
+			   			   text.insert(END, "\nx1 = x2 = " + str(round(x1)) + " / " + str(round(a)) + " = " + str("%.2f"%(x1/a)))
 			   			   
 def svoistva():
     Button(window, state = DISABLED, width = 10, text = "a + b + c = 0", command = lambda: svoistva()).grid(row = 3, column = 0, sticky = SW, padx = 810, pady = 10)
