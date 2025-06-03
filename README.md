@@ -29,14 +29,14 @@
   <img src="https://github.com/user-attachments/assets/b8d900bb-848d-4852-941e-1ef6a8a3d6df" alt="Главное меню" style="display: block; margin: 0 auto;"/>
 </p>
 <p style="text-align: center;">
-  <em>Главное меню</em>
+  <em>Окно приложения</em>
 </p>
 
 <p style="text-align: center;">
   <img src="https://github.com/user-attachments/assets/a1ae530e-3b88-4d2f-87fe-8e9e92f548f1" alt="Окно приложения" style="display: block; margin: 0 auto;"/>
 </p>
 <p style="text-align: center;">
-  <em>Окно приложения</em>
+  <em>Инструкция</em>
 </p>
 
 <p style="text-align: center;">
