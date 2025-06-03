@@ -3,13 +3,18 @@ from tkinter import messagebox as mb
 import math
 
 def how_to_use():
-	answer = mb.showinfo(title = "Как пользоваться программой?", message = "1. Введите коэффициенты уравнения, следуя правилам ввода данных.\n2. Нажмите на кнопку «Готово».\n3. Выберите интересующий вас способ решения.\n4. Чтобы завершить работу программы, нажмите на кнопку «Выйти»\nв верхней панели меню.")
+	answer = mb.showinfo(title = "Справка", message = "Инструкция:", detail = "1. Введите коэффициенты уравнения, следуя правилам ввода данных.\n2. Нажмите на кнопку «Готово».\n3. Выберите интересующий вас способ решения.\n4. Чтобы завершить работу программы, нажмите на кнопку «Выйти»\nв верхней панели меню.")
 	
 def entry_rules():
- 	answer = mb.showinfo(title = "Правила ввода", message = "1. Поле ввода не должно содержать лишних символов, кроме числового\nзначения коэффициента.\n2. Нельзя оставлять поле ввода пустым. Если один из коэффициентов\nотсутствует, вместо него нужно ввести 0. При этом, коэффициент а ≠ 0!\n3. Если перед х² или х отсутствует числовое значение, то это значит, что\nкоэффициент равен 1.")
+ 	answer = mb.showinfo(title = "Справка", message = "Правила ввода:", detail = "1. Поле ввода не должно содержать лишних символов, кроме числового\nзначения коэффициента.\n2. Нельзя оставлять поле ввода пустым. Если один из коэффициентов\nотсутствует, вместо него нужно ввести 0. При этом, коэффициент а ≠ 0!\n3. Если перед х² или х отсутствует числовое значение, то это значит, что\nкоэффициент равен 1.")
  	
 def examples():
- 	answer = mb.showinfo(title = "Примеры", message = "В скобках указаны данные, которые необходимо ввести в\nсоответствующее поле:\nx² + 2x - 3 = 0 (a = 1, b = 2, c = -3)\nx² - x - 6 = 0 (a = 1, b = -1, c = -6)\n2х² - 50 = 0 (а = 2, b = 0, c = -50)\n3x² + 12x = 0 (a = 3, b = 12, c = 0)\n5x² = 0 (а = 5, b = 0, c = 0)")
+ 	answer = mb.showinfo(title = "Справка", message = "В скобках указаны данные, необходимые для работы программы.", detail = "x² + 2x - 3 = 0 (a = 1, b = 2, c = -3)\nx² - x - 6 = 0 (a = 1, b = -1, c = -6)\n2х² - 50 = 0 (а = 2, b = 0, c = -50)\n3x² + 12x = 0 (a = 3, b = 12, c = 0)\n5x² = 0 (а = 5, b = 0, c = 0)")
+ 	
+def exit():
+        answer = mb.askyesno( title="Выход", message="Вы действительно хотите выйти?")
+        if answer:
+        	window.quit()
  	
 def ready():
 	try:
@@ -264,17 +269,17 @@ menubar = Menu(window)
 helpmenu = Menu(menubar, tearoff=0)
 menubar.add_cascade(label="Справка", menu=helpmenu)
 
+menubar.add_command(label="Выйти", command=exit)
+
 helpmenu.add_command(label="Как пользоваться программой?", command=how_to_use)
 
 helpmenu2 = Menu(helpmenu, tearoff=0)
 helpmenu2.add_command(
-    label="Правила", command = entry_rules)
+    label="Как вводить данные?", command = entry_rules)
 helpmenu2.add_command(
     label="Примеры", command = examples)
  
 helpmenu.add_cascade(label="Ввод данных", menu = helpmenu2)
-
-menubar.add_command(label="Выйти", command=window.quit)
 
 window.config(menu=menubar)
 
