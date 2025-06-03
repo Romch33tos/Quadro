@@ -3,17 +3,28 @@ from tkinter import messagebox as mb
 import math
 
 def how_to_use():
-	answer = mb.showinfo(title = "Как пользоваться программой?", message = "1. Введите коэффициенты уравнения, следуя правилам ввода данных.\n2. Нажмите на кнопку «Готово» и выберите интересующий вас способ.\n3. Чтобы завершить работу программы, нажмите кнопку «Выйти» в \nверхней панели меню.")
+	answer = mb.showinfo(title = "Как пользоваться программой?", message = "1. Введите коэффициенты уравнения, следуя правилам ввода данных.\n2. Нажмите на кнопку «Готово» и выберите интересующий вас способ.\n3. Если вы хотите завершить работу программы, нажмите кнопку \n«Выйти» в верхней панели меню.")
 
 def entry_rules():
- 	answer = mb.showinfo(title = "Правила ввода", message = "1. Поле ввода не должно содержать лишних символов кроме числового\nзначения коэффициента.\n2. Если у уравнения отсутствует коэффициент b или c, то в поле ввода\nнужно ввести число 0.\n3. Коэффициент a не может равняться нулю!\n4. Если перед x² или x отсутствует числовое значение, то коэффициент\nперед ними равен 1.")
+ 	answer = mb.showinfo(title = "Правила ввода", message = "1. Поле ввода не должно содержать лишних символов, кроме числового\nзначения коэффициента.\n2. Если у уравнения отсутствует коэффициент b или c, то вместо него\nв поле ввода нужно ввести 0.\n3. Коэффициент a не может равняться нулю!\n4. Если перед x² или x отсутствует числовое значение, то коэффициент\nравен 1.")
  	
 def ready():
-	text.delete("1.0", END)
-	a = float(a1.get())
-	b = float(b1.get())
-	c  = float(c1.get())
-	d = (b**2 - 4*a*c)
+	try:
+		text.delete("1.0", END)
+		a = float(a1.get())
+		b = float(b1.get())
+		c  = float(c1.get())
+		d = (b**2 - 4*a*c)
+	except ValueError:
+		answer = mb.showerror(title = "Ошибка ввода" , message ="Убедитесь в том, что вы ввели все данные верно!")
+	if d > 0 and (a !=0) and (b !=0) and (c !=0):
+			text.insert("1.0", "D = b² - 4ac = " +str(round(b*b)) + " - 4 × " + str(round(a)) +" × " + str(round(c)) + " = " + str("%.2f"%(d)))
+			text.insert(END, "\nУравнение имеет два различных корня.")
+			text.insert(END, "\nВыберите способ решения. ")
+	if d == 0 and (a !=0) and (b !=0) and (c !=0):
+		text.insert("1.0", "D = b² - 4ac = " +str(round(b*b)) + " - 4 × " + str(round(a)) +" × " + str(round(c)) + " = " + str("%.2f"%(d)))
+		text.insert(END, "\nУравнение имеет два одинаковых корня.")
+		text.insert(END, "\nВыберите способ решения.")
 	
 	Button(window, state = DISABLED, width = 10, text = "D", command = lambda: discr()).grid(row = 1, column = 0, sticky = SW, padx = 810, pady = 10)
 
@@ -46,18 +57,39 @@ def ready():
 		
 	if (a != 0) and (b != 0) and (c != 0) and d >= 0:
 		Button(window, state = NORMAL, width = 10, text = "Схема Горнера", command = lambda: Gorner()).grid(row = 3, column = 0, sticky = SW, padx = 1090, pady = 10)
-
-	if (a != 0) and ((b == 0) or (c == 0)):
+		
+	if (a != 0) and (b == 0) and (c != 0) and ((-c//a) > 0):
+		text.insert("1.0", "Вы ввели неполное квадратное уравнение.")
+		text.insert(END, "\nНажмите на кнопку «Неполное», чтобы увидеть решение.")
+		Button(window, state = NORMAL, width = 10, text = "Неполное", command = lambda: nepolnoe()).grid(row = 4, column = 0, sticky = SW, padx = 950, pady = 10)
+	if (a != 0) and (b != 0) and (c == 0):
+		text.insert("1.0", "Вы ввели неполное квадратное уравнение.")
+		text.insert(END, "\nНажмите на кнопку «Неполное», чтобы увидеть решение.")
+		Button(window, state = NORMAL, width = 10, text = "Неполное", command = lambda: nepolnoe()).grid(row = 4, column = 0, sticky = SW, padx = 950, pady = 10)
+	if (a != 0) and (b == 0) and (c == 0):
+		text.insert("1.0", "Вы ввели неполное квадратное уравнение.")
+		text.insert(END, "\nНажмите на кнопку «Неполное», чтобы увидеть решение.")
 		Button(window, state = NORMAL, width = 10, text = "Неполное", command = lambda: nepolnoe()).grid(row = 4, column = 0, sticky = SW, padx = 950, pady = 10)
 		
 	if (a == 0):
+		text.delete("1.0", END)
 		answer = mb.showerror(title = "Ошибка" , message ="Коэффициент a не может быть равен нулю!")
 	if d < 0 and (a != 0) and (b != 0) and (c != 0):
-		text.insert("1.0", "D = b² - 4ac = " +str(round(b*b)) + " - 4 × " + str(round(a)) +" × " + str(round(c)) + " = " + str("%.2f"%(d)) + ", D < 0, корней нет.")
+		text.delete("1.0", END)
+		text.insert("1.0", "D = b² - 4ac = " +str(round(b*b)) + " - 4 × " + str(round(a)) +" × " + str(round(c)) + " = " + str("%.2f"%(d)) + ", D < 0, нет корней")
 		
-	if (b == 0) and (a !=0) and (c != 0) and ((-c // a) < 0):
-			Button(window, state = DISABLED, width = 10, text = "Неполное", command = lambda: nepolnoe()).grid(row = 4, column = 0, sticky = SW, padx = 950, pady = 10)
-			text.insert("1.0", "x² ≠ " + str("%.2f"%(-c/a)) + ", корней нет")
+	if (b == 0) and (a !=0) and (c != 0) and ((-c / a) < 0) and (a > 0) and (c > 0):
+		Button(window, state = DISABLED, width = 10, text = "Неполное", command = lambda: nepolnoe()).grid(row = 4, column = 0, sticky = SW, padx = 950, pady = 10)
+		text.insert("1.0", "Вы ввели неполное квадратное уравнение: " +str(round(a)) + "x²" + " + " + str(round(c)) + " = 0")
+		text.insert(END, "\nx² = " + str(round(-c)) + " / " + str(round(a)))
+		text.insert(END, "\nx² = " + str("%.2f"%(-c//a)))
+		text.insert(END, "\nНет корней")
+	if (b == 0) and (a !=0) and (c != 0) and ((-c / a) < 0) and (a < 0) and (c < 0):
+		Button(window, state = DISABLED, width = 10, text = "Неполное", command = lambda: nepolnoe()).grid(row = 4, column = 0, sticky = SW, padx = 950, pady = 10)
+		text.insert("1.0", "Вы ввели неполное квадратное уравнение: " + str(round(a)) + "x²" + " - " + str(round(-c)) + " = 0")
+		text.insert(END, "\nx² = " + str(round(-c)) + " / " + str(round(a)))
+		text.insert(END, "\nx² = " + str("%.2f"%(-c//a)))
+		text.insert(END, "\nНет корней")
 			
 def discr():
 	Button(window, state = DISABLED, width = 10, text = "D", command = lambda: discr()).grid(row = 1, column = 0, sticky = SW, padx = 810, pady = 10)
@@ -107,7 +139,7 @@ def Viet():
 				q = (x1 * x2)
 				if (p == -b) and (q == c) and (x1 != x2):
 					text.insert(END, "\nx1 = " + str(x1) + ", x2 = " + str(x2))
-					
+											
 def perebros():
 	Button(window, state = DISABLED, width = 10, text = "Переброска", command = lambda: perebros()).grid(row = 2, column = 0, sticky = SW, padx = 1090, pady = 10)
 	text.delete("1.0", END)
@@ -256,6 +288,7 @@ l6 = Label(window, text = "Решение")
 l6.grid(row = 4, column = 0, sticky = SW, pady = 10, padx = 623)
 
 a1 = Entry(window, width = 14, justify = CENTER)
+a1.focus()
 a1.grid(row = 1, column = 0, sticky = NW, padx = 300, pady = 10)
 
 b1 = Entry(window, width = 14, justify = CENTER)
