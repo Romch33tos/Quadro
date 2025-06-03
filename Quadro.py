@@ -106,13 +106,13 @@ def ready():
 		
 	if (b == 0) and (a !=0) and (c != 0) and ((-c / a) < 0) and (a > 0) and (c > 0):
 		Button(window, state = DISABLED, width = 10, text = "Неполное", command = lambda: nepolnoe()).grid(row = 4, column = 0, sticky = SW, padx = 950, pady = 10)
-		text.insert("1.0", "Вы ввели неполное квадратное уравнение: " +str(round(a)) + "x²" + " + " + str(round(c)) + " = 0")
+		text.insert("1.0", str(round(a)) + "x²" + " + " + str(round(c)) + " = 0")
 		text.insert(END, "\nx² = " + str(round(-c)) + " / " + str(round(a)))
 		text.insert(END, "\nx² = " + str("%.2f"%(-c//a)))
 		text.insert(END, "\nНет корней")
 	if (b == 0) and (a !=0) and (c != 0) and ((-c / a) < 0) and (a < 0) and (c < 0):
 		Button(window, state = DISABLED, width = 10, text = "Неполное", command = lambda: nepolnoe()).grid(row = 4, column = 0, sticky = SW, padx = 950, pady = 10)
-		text.insert("1.0", "Вы ввели неполное квадратное уравнение: " + str(round(a)) + "x²" + " - " + str(round(-c)) + " = 0")
+		text.insert("1.0", str(round(a)) + "x²" + " - " + str(round(-c)) + " = 0")
 		text.insert(END, "\nx² = " + str(round(-c)) + " / " + str(round(a)))
 		text.insert(END, "\nx² = " + str("%.2f"%(-c//a)))
 		text.insert(END, "\nНет корней")
