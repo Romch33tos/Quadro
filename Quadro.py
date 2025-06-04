@@ -9,6 +9,38 @@ root.resizable(width = False, height= False)
 set_appearance_mode("dark")
 set_default_color_theme("blue")
 
+def clear_all(): 
+    text.configure(state = NORMAL)
+    text.delete("1.0", END)
+    a1.configure(state = NORMAL)
+    b1.configure(state = NORMAL)
+    c1.configure(state = NORMAL)
+    a1.delete(0, END)
+    b1.delete(0, END)
+    c1.delete(0, END)
+    a1.focus()
+    text.configure(state = DISABLED)
+    block()
+    READY.configure(state = NORMAL)
+    a1.configure(state = NORMAL)
+    b1.configure(state = NORMAL)
+    c1.configure(state = NORMAL)
+    
+def block():
+    READY.configure(state = DISABLED)
+    D.configure(state = DISABLED)
+    D4.configure(state = DISABLED)
+    V.configure(state = DISABLED)
+    P.configure(state = DISABLED)
+    S.configure(state = DISABLED)
+    N.configure(state = DISABLED)
+    a1.configure(state = DISABLED)
+    b1.configure(state = DISABLED)
+    c1.configure(state = DISABLED)		
+    
+def ready():
+    block()
+
 text = CTkTextbox(root, width = 567, height = 160, wrap = WORD, font = ("Arial", 30))
 text.grid(row = 0, column = 0, padx = 10,pady = 5, sticky = NW, ipadx = 5)
 text.configure(state = DISABLED)
@@ -27,6 +59,7 @@ l5.grid(row = 4, column = 0, sticky = NW, padx = 10, pady = 5)
 
 a1 = CTkEntry(root, width = 100, justify = CENTER, font = ("Arial", 30))
 a1.grid(row = 2, column = 0, sticky = NW, padx = 260, pady = 5)
+a1.focus()
 
 b1 = CTkEntry(root, width = 100, justify = CENTER, font = ("Arial", 30))
 b1.grid(row = 3, column = 0, sticky = NW, padx = 260, pady = 5)
@@ -34,10 +67,10 @@ b1.grid(row = 3, column = 0, sticky = NW, padx = 260, pady = 5)
 c1 = CTkEntry(root, width = 100, justify = CENTER, font = ("Arial", 30))
 c1.grid(row = 4, column = 0, sticky = NW, padx = 260, pady = 5)
 
-READY = CTkButton(root, width = 255, text = "Готово", command = lambda: Discriminant(), font = ("Arial", 30), corner_radius = 20)
+READY = CTkButton(root, width = 255, text = "Готово", command = lambda: ready(), font = ("Arial", 30), corner_radius = 20)
 READY.grid(row = 5, column = 0, sticky = NW, padx = 10, pady = 5,ipady = 5, ipadx = 10)
 
-CLR = CTkButton(root, width = 255, text = "Очистить все", command = lambda: Discriminant(), font = ("Arial", 30), corner_radius = 20)
+CLR = CTkButton(root, width = 255, text = "Очистить все", command = lambda: clear_all(), font = ("Arial", 30), corner_radius = 20)
 CLR.grid(row = 5, column = 0, sticky = NW, padx = 310, pady = 5,ipady = 5, ipadx = 10)
 
 l6 = CTkLabel(root, text = "Метод решения:",font = ("Arial", 30))
@@ -52,8 +85,8 @@ D4.grid(row = 7, column = 0, sticky = NW, padx = 310, pady = 5,ipady = 5, ipadx 
 D = CTkButton(root, width = 255, text = "D", command = lambda: Discriminant(), font = ("Arial", 30), corner_radius = 20)
 D.grid(row = 7, column = 0, sticky = NW, padx = 10, pady = 5,ipady = 5, ipadx = 10)
 
-TV = CTkButton(root, width = 255, text = "Теорема Виета", command = lambda: Discriminant(), font = ("Arial", 30), corner_radius = 20)
-TV.grid(row = 8, column = 0, sticky = NW, padx = 10, pady = 5,ipady = 5, ipadx = 10)
+V = CTkButton(root, width = 255, text = "Теорема Виета", command = lambda: Discriminant(), font = ("Arial", 30), corner_radius = 20)
+V.grid(row = 8, column = 0, sticky = NW, padx = 10, pady = 5,ipady = 5, ipadx = 10)
 
 P = CTkButton(root, width = 255, text = "Переброска", command = lambda: Discriminant(), font = ("Arial", 30), corner_radius = 20)
 P.grid(row = 8, column = 0, sticky = NW, padx = 310, pady = 5,ipady = 5, ipadx = 10)
