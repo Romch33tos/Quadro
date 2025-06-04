@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import *
+from tkinter import messagebox as mb
 from customtkinter import *
 
 root = CTk()
@@ -9,17 +10,25 @@ root.resizable(width = False, height= False)
 set_appearance_mode("dark")
 set_default_color_theme("blue")
 
-def clear_all(): 
-    text.configure(state = NORMAL)
-    text.delete("1.0", END)
+def clear_text():
+     text.configure(state = NORMAL)
+     text.delete("1.0", END)
+     text.configure(state = DISABLED)
+     
+def clear_entry():
     a1.configure(state = NORMAL)
     b1.configure(state = NORMAL)
     c1.configure(state = NORMAL)
     a1.delete(0, END)
     b1.delete(0, END)
     c1.delete(0, END)
-    a1.focus()
-    text.configure(state = DISABLED)
+    a1.configure(state = DISABLED)
+    b1.configure(state = DISABLED)
+    c1.configure(state = DISABLED)
+    
+def clear_all():
+    clear_text()
+    clear_entry()
     block()
     READY.configure(state = NORMAL)
     a1.configure(state = NORMAL)
@@ -40,7 +49,17 @@ def block():
     
 def ready():
     block()
-
+    try:
+        a = int(a1.get())
+        b = int(b1.get())
+        c  = int(c1.get())
+        if (a == 0):
+            answer = mb.showerror(title = "Ошибка" , message ="Коэффициент «a» не может\nбыть равен нулю!")
+        elif (a != 0):
+            d = (b**2 - 4*a*c)		  
+    except ValueError:
+        answer = mb.showerror(title = "Ошибка ввода" , message ="Убедитесь в том, что вы\nввели все данные верно!")
+		
 text = CTkTextbox(root, width = 567, height = 160, wrap = WORD, font = ("Arial", 30))
 text.grid(row = 0, column = 0, padx = 10,pady = 5, sticky = NW, ipadx = 5)
 text.configure(state = DISABLED)
