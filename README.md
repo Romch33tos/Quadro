@@ -17,6 +17,6 @@
 - Методы решения неполных квадратных уравнений  
 
 ## Скриншоты приложения
-| ![Меню](https://github.com/user-attachments/assets/dc5fc18c-9d00-4938-87e4-eab01bc57365) | ![image](https://github.com/user-attachments/assets/834702bc-06ed-44b1-8e35-4bcf4a627024) |
+|![Меню](https://github.com/user-attachments/assets/42a63ea0-9d1d-4c2b-b9f1-3ec5f066e80f)| ![image](https://github.com/user-attachments/assets/834702bc-06ed-44b1-8e35-4bcf4a627024) |
 | --- | --- |
 | ![Виет](https://github.com/user-attachments/assets/92749f2b-5283-481b-8fd2-f138925e35b0) | ![image](https://github.com/user-attachments/assets/aaa3049c-0bbb-4de1-8fe9-389cd557ee6a) |
