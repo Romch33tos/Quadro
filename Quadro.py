@@ -1,13 +1,13 @@
 import tkinter as tk
 import math
-from customtkinter import CTk, CTkTextbox, CTkLabel, CTkEntry, CTkButton
+from customtkinter import CTk, CTkTextbox, CTkLabel, CTkEntry, CTkButton, CTkToplevel
 from customtkinter import set_appearance_mode, set_default_color_theme
 
 class QuadraticEquationSolver:
   def __init__(self):
     self.root = CTk()
     self.root.title("Quadro")
-    self.root.geometry("370x465")
+    self.root.geometry("370x505")
     self.root.resizable(width=False, height=False)
     set_appearance_mode("dark")
     set_default_color_theme("blue")
@@ -18,13 +18,59 @@ class QuadraticEquationSolver:
     self.discriminant = 0
     self.root1 = 0
     self.root2 = 0
+    self.help_window = None
 
     self.create_widgets()
     self.root.mainloop()
 
+  def show_help(self):
+    if self.help_window is not None:
+      self.help_window.lift()
+      return
+
+    self.btn_help.configure(state=tk.DISABLED)
+
+    self.help_window = CTkToplevel(self.root)
+    self.help_window.title("Руководство")
+    self.help_window.geometry("500x340")
+    self.help_window.resizable(width=False, height=False)
+
+    self.help_window.protocol("WM_DELETE_WINDOW", self.on_help_window_close)
+
+    help_text = """Руководство по использованию приложения:
+
+1. Введите коэффициенты уравнения в поля ввода.
+2. Нажмите кнопку "Готово" или Enter.
+3. Выберите доступный метод решения.
+4. Используйте кнопку "Очистить все" для очистки полей.
+
+Правила ввода:
+
+1. Если один из коэффициентов отсутствует, вместо него необходимо ввести 0.
+2. Коэффициент "а" не может быть равен 0.
+3. Нельзя вводить посторонние символы, помимо цифр и знака "-".
+"""
+
+    help_label = CTkTextbox(self.help_window, width=480, height=320, wrap=tk.WORD, font=("Calibri", 18))
+    help_label.pack(padx=10, pady=10)
+    help_label.insert("1.0", help_text)
+    help_label.configure(state=tk.DISABLED)
+
+  def on_help_window_close(self):
+    self.btn_help.configure(state=tk.NORMAL)
+    if self.help_window:
+      self.help_window.destroy()
+      self.help_window = None
+
   def create_widgets(self):
+    self.btn_help = CTkButton(
+      self.root, width=80, text="Справка", command=self.show_help,
+      font=("Calibri", 18), fg_color="transparent", hover_color=("#3a7ebf", "#1f538d")
+    )
+    self.btn_help.grid(row=0, column=0, sticky=tk.NW, padx=10, pady=7)
+
     self.text_display = CTkTextbox(self.root, width=340, height=120, wrap=tk.WORD, font=("Calibri", 18))
-    self.text_display.grid(row=0, column=0, padx=10, pady=7, sticky=tk.NW, ipadx=5)
+    self.text_display.grid(row=1, column=0, padx=10, pady=7, sticky=tk.NW, ipadx=5)
     self.text_display.insert("1.0", "Введите коэффициенты уравнения")
     self.text_display.configure(state=tk.DISABLED)
 
@@ -78,7 +124,7 @@ class QuadraticEquationSolver:
     self.btn_half_discriminant.grid(row=7, column=0, sticky=tk.NW, padx=190, pady=4, ipady=4, ipadx=8)
 
     self.btn_vieta = CTkButton(
-      self.root, width=150, text="Теорема Виета", command=self.solve_with_vieta,
+      self.root, width=150, text="Теорема_Виета", command=self.solve_with_vieta,
       font=("Calibri", 18, "bold"), corner_radius=7, height=25, state=tk.DISABLED
     )
     self.btn_vieta.grid(row=8, column=0, sticky=tk.NW, padx=10, pady=4, ipady=4, ipadx=8)
@@ -90,7 +136,7 @@ class QuadraticEquationSolver:
     self.btn_coefficient_transfer.grid(row=8, column=0, sticky=tk.NW, padx=190, pady=4, ipady=4, ipadx=8)
 
     self.btn_coefficient_properties = CTkButton(
-      self.root, width=150, text="a ± b + c = 0", command=self.solve_with_coefficient_properties,
+      self.root, width=150, text="a + b + c = 0", command=self.solve_with_coefficient_properties,
       font=("Calibri", 18, "bold"), corner_radius=7, height=25, state=tk.DISABLED
     )
     self.btn_coefficient_properties.grid(row=9, column=0, sticky=tk.NW, padx=10, pady=4, ipady=4, ipadx=8)
@@ -165,13 +211,13 @@ class QuadraticEquationSolver:
       formatted_d = self.format_number(self.discriminant)
 
       if (self.coeff_a > 0 and self.coeff_c > 0) or (self.coeff_a < 0 and self.coeff_c < 0):
-        self.text_display.insert("1.0", 
-          f"D = {self.coeff_b}² - 4 × {self.coeff_a} × {self.coeff_c} = "
+        self.text_display.insert("1.0",
+          f"D = {self.coeff_b}^2 - 4 × {self.coeff_a} × {self.coeff_c} = "
           f"{self.coeff_b**2} - {4 * self.coeff_a * self.coeff_c} = {formatted_d}"
         )
       elif (self.coeff_a < 0) ^ (self.coeff_c < 0):
-        self.text_display.insert("1.0", 
-          f"D = {self.coeff_b}² + 4 × {abs(self.coeff_a)} × {abs(self.coeff_c)} = "
+        self.text_display.insert("1.0",
+          f"D = {self.coeff_b}^2 + 4 × {abs(self.coeff_a)} × {abs(self.coeff_c)} = "
           f"{self.coeff_b**2} + {abs(4 * self.coeff_a * self.coeff_c)} = {formatted_d}"
         )
 
@@ -189,7 +235,6 @@ class QuadraticEquationSolver:
       sqrt_d = math.sqrt(self.discriminant)
       self.root1 = (-self.coeff_b + sqrt_d) / (2 * self.coeff_a)
       self.root2 = (-self.coeff_b - sqrt_d) / (2 * self.coeff_a)
-
       self.btn_discriminant.configure(state=tk.NORMAL)
       sqrt_d_int = int(sqrt_d)
       root1_int = int(self.root1)
@@ -197,14 +242,11 @@ class QuadraticEquationSolver:
 
       if (root1_int == self.root1 or root2_int == self.root2 or sqrt_d_int == sqrt_d):
         self.btn_coefficient_transfer.configure(state=tk.NORMAL)
-
       if (self.coeff_a == 1) and root1_int == self.root1 and root2_int == self.root2:
         self.btn_vieta.configure(state=tk.NORMAL)
-
-      if ((self.coeff_a + self.coeff_b + self.coeff_c == 0) or 
+      if ((self.coeff_a + self.coeff_b + self.coeff_c == 0) or
           (self.coeff_a - self.coeff_b + self.coeff_c == 0)):
         self.btn_coefficient_properties.configure(state=tk.NORMAL)
-
       if (self.coeff_b != 0) and (self.coeff_b % 2 == 0):
         self.btn_half_discriminant.configure(state=tk.NORMAL)
 
@@ -230,23 +272,23 @@ class QuadraticEquationSolver:
     formatted_root2 = self.format_number(self.root2)
 
     if (self.coeff_a > 0 and self.coeff_c > 0) or (self.coeff_a < 0 and self.coeff_c < 0):
-      self.text_display.insert("1.0", 
-        f"D = {self.coeff_b}² - 4 × {self.coeff_a} × {self.coeff_c} = "
+      self.text_display.insert("1.0",
+        f"D = {self.coeff_b}^2 - 4 × {self.coeff_a} × {self.coeff_c} = "
         f"{self.coeff_b**2} - {4 * self.coeff_a * self.coeff_c} = {formatted_d}"
       )
     elif (self.coeff_a < 0) ^ (self.coeff_c < 0):
-      self.text_display.insert("1.0", 
-        f"D = {self.coeff_b}² + 4 × {abs(self.coeff_a)} × {abs(self.coeff_c)} = "
+      self.text_display.insert("1.0",
+        f"D = {self.coeff_b}^2 + 4 × {abs(self.coeff_a)} × {abs(self.coeff_c)} = "
         f"{self.coeff_b**2} + {abs(4 * self.coeff_a * self.coeff_c)} = {formatted_d}"
       )
 
     self.text_display.insert(tk.END, "\nПо формуле корней:")
-    self.text_display.insert(tk.END, 
-      f"\nх₁ = ({-self.coeff_b} + {self.format_number(sqrt_d)}) / (2 × {self.coeff_a}) = "
+    self.text_display.insert(tk.END,
+      f"\nx₁ = ({-self.coeff_b}) + {self.format_number(sqrt_d)}) / (2 × {self.coeff_a}) = "
       f"{self.format_number(-self.coeff_b + sqrt_d)} / {2 * self.coeff_a} = {formatted_root1}"
     )
-    self.text_display.insert(tk.END, 
-      f"\nх₂ = ({-self.coeff_b} - {self.format_number(sqrt_d)}) / (2 × {self.coeff_a}) = "
+    self.text_display.insert(tk.END,
+      f"\nx₂ = ({-self.coeff_b}) - {self.format_number(sqrt_d)}) / (2 × {self.coeff_a}) = "
       f"{self.format_number(-self.coeff_b - sqrt_d)} / {2 * self.coeff_a} = {formatted_root2}"
     )
     self.text_display.configure(state=tk.DISABLED)
@@ -265,23 +307,23 @@ class QuadraticEquationSolver:
     formatted_root2 = self.format_number(root2)
 
     if (self.coeff_a > 0 and self.coeff_c > 0) or (self.coeff_a < 0 and self.coeff_c < 0):
-      self.text_display.insert("1.0", 
-        f"k = {self.format_number(half_b)}, D/4 = {self.format_number(half_b)}² - {self.coeff_a} × {self.coeff_c} = "
+      self.text_display.insert("1.0",
+        f"k = {self.format_number(half_b)}, D/4 = {self.format_number(half_b)}^2 - {self.coeff_a} × {self.coeff_c} = "
         f"{self.format_number(half_b**2)} - {self.coeff_a * self.coeff_c} = {formatted_d4}"
       )
     elif (self.coeff_a < 0) ^ (self.coeff_c < 0):
-      self.text_display.insert("1.0", 
-        f"k = {self.format_number(half_b)}, D/4 = {self.format_number(half_b)}² + {abs(self.coeff_a)} × {abs(self.coeff_c)} = "
+      self.text_display.insert("1.0",
+        f"k = {self.format_number(half_b)}, D/4 = {self.format_number(half_b)}^2 + {abs(self.coeff_a)} × {abs(self.coeff_c)} = "
         f"{self.format_number(half_b**2)} + {abs(self.coeff_a * self.coeff_c)} = {formatted_d4}"
       )
 
     self.text_display.insert(tk.END, "\nЧерез половину коэффициента:")
-    self.text_display.insert(tk.END, 
-      f"\nх₁ = ({self.format_number(-half_b)} + {self.format_number(sqrt_d4)}) / {self.coeff_a} = "
+    self.text_display.insert(tk.END,
+      f"\nx₁ = ({self.format_number(-half_b)}) + {self.format_number(sqrt_d4)}) / {self.coeff_a} = "
       f"{self.format_number(-half_b + sqrt_d4)} / {self.coeff_a} = {formatted_root1}"
     )
-    self.text_display.insert(tk.END, 
-      f"\nх₂ = ({self.format_number(-half_b)} - {self.format_number(sqrt_d4)}) / {self.coeff_a} = "
+    self.text_display.insert(tk.END,
+      f"\nx₂ = ({self.format_number(-half_b)}) - {self.format_number(sqrt_d4)}) / {self.coeff_a} = "
       f"{self.format_number(-half_b - sqrt_d4)} / {self.coeff_a} = {formatted_root2}"
     )
     self.text_display.configure(state=tk.DISABLED)
@@ -307,7 +349,7 @@ class QuadraticEquationSolver:
     self.text_display.insert("1.0", "Методом переброски коэффициента:")
     self.text_display.insert(tk.END, f"\nx₁ + x₂ = {-self.coeff_b}")
     self.text_display.insert(tk.END, f"\nx₁ × x₂ = {self.coeff_c * self.coeff_a}")
-    self.text_display.insert(tk.END, 
+    self.text_display.insert(tk.END,
       f"\nx₁ = {self.format_number(self.root1 * self.coeff_a)} / {self.coeff_a} = {formatted_root1}, "
       f"x₂ = {self.format_number(self.root2 * self.coeff_a)} / {self.coeff_a} = {formatted_root2}"
     )
@@ -348,9 +390,8 @@ class QuadraticEquationSolver:
       ratio = -self.coeff_c / self.coeff_a
       formatted_ratio = self.format_number(ratio)
 
-      self.text_display.insert("1.0", f"{a_sign}x² {sign} {abs(self.coeff_c)} = 0")
-      self.text_display.insert(tk.END, f"\nx² = {formatted_ratio}")
-
+      self.text_display.insert("1.0", f"{a_sign}x^2 {sign} {abs(self.coeff_c)} = 0")
+      self.text_display.insert(tk.END, f"\nx^2 = {formatted_ratio}")
       if ratio < 0:
         self.text_display.insert(tk.END, "\nНет корней!")
       else:
@@ -366,7 +407,7 @@ class QuadraticEquationSolver:
       sign = "+" if (self.coeff_a < 0 and self.coeff_b < 0) else "-" if (self.coeff_a < 0) else sign
       a_sign = "" if self.coeff_a == -1 else abs(self.coeff_a) if self.coeff_a < 0 else a_sign
 
-      self.text_display.insert("1.0", f"{a_sign}x² {sign} {b_sign}x = 0")
+      self.text_display.insert("1.0", f"{a_sign}x^2 {sign} {b_sign}x = 0")
 
       ratio = self.coeff_b / self.coeff_a
       formatted_ratio = self.format_number(abs(ratio))
@@ -381,7 +422,7 @@ class QuadraticEquationSolver:
       self.text_display.insert(tk.END, f"\nx₁ = {root1}, x₂ = {formatted_root2}")
 
     elif self.coeff_a != 0 and self.coeff_b == 0 and self.coeff_c == 0:
-      self.text_display.insert("1.0", f"{a_sign}x² = 0")
+      self.text_display.insert("1.0", f"{a_sign}x^2 = 0")
       self.text_display.insert(tk.END, "\nx = 0")
 
     self.text_display.configure(state=tk.DISABLED)
