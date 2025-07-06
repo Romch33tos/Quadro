@@ -284,11 +284,11 @@ class QuadraticEquationSolver:
 
     self.text_display.insert(tk.END, "\nПо формуле корней:")
     self.text_display.insert(tk.END,
-      f"\nx₁ = ({-self.coeff_b}) + {self.format_number(sqrt_d)}) / (2 × {self.coeff_a}) = "
+      f"\nx₁ = ({-self.coeff_b} + {self.format_number(sqrt_d)}) / (2 × {self.coeff_a}) = "
       f"{self.format_number(-self.coeff_b + sqrt_d)} / {2 * self.coeff_a} = {formatted_root1}"
     )
     self.text_display.insert(tk.END,
-      f"\nx₂ = ({-self.coeff_b}) - {self.format_number(sqrt_d)}) / (2 × {self.coeff_a}) = "
+      f"\nx₂ = ({-self.coeff_b} - {self.format_number(sqrt_d)}) / (2 × {self.coeff_a}) = "
       f"{self.format_number(-self.coeff_b - sqrt_d)} / {2 * self.coeff_a} = {formatted_root2}"
     )
     self.text_display.configure(state=tk.DISABLED)
@@ -319,11 +319,11 @@ class QuadraticEquationSolver:
 
     self.text_display.insert(tk.END, "\nЧерез половину коэффициента:")
     self.text_display.insert(tk.END,
-      f"\nx₁ = ({self.format_number(-half_b)}) + {self.format_number(sqrt_d4)}) / {self.coeff_a} = "
+      f"\nx₁ = ({self.format_number(-half_b)} + {self.format_number(sqrt_d4)}) / {self.coeff_a} = "
       f"{self.format_number(-half_b + sqrt_d4)} / {self.coeff_a} = {formatted_root1}"
     )
     self.text_display.insert(tk.END,
-      f"\nx₂ = ({self.format_number(-half_b)}) - {self.format_number(sqrt_d4)}) / {self.coeff_a} = "
+      f"\nx₂ = ({self.format_number(-half_b)} - {self.format_number(sqrt_d4)}) / {self.coeff_a} = "
       f"{self.format_number(-half_b - sqrt_d4)} / {self.coeff_a} = {formatted_root2}"
     )
     self.text_display.configure(state=tk.DISABLED)
