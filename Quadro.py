@@ -23,12 +23,38 @@ class QuadraticEquationSolver:
     self.create_widgets()
     self.root.mainloop()
 
+  def animate_button_state(self, button, target_state):
+    current_color = button.cget("fg_color")
+    if target_state == tk.NORMAL:
+      target_color = ("#3a7ebf", "#1f538d") if current_color == "transparent" else current_color
+      steps = 10
+      for i in range(steps + 1):
+        alpha = i / steps
+        if isinstance(current_color, tuple) and isinstance(target_color, tuple):
+          color = self.interpolate_color(current_color, target_color, alpha)
+        else:
+          color = target_color
+        button.configure(fg_color=color)
+        self.root.update()
+        self.root.after(20)
+    else:
+      button.configure(fg_color="transparent")
+    button.configure(state=target_state)
+
+  def interpolate_color(self, color1, color2, alpha):
+    r1, g1, b1 = int(color1[0][1:3], 16), int(color1[0][3:5], 16), int(color1[0][5:7], 16)
+    r2, g2, b2 = int(color2[0][1:3], 16), int(color2[0][3:5], 16), int(color2[0][5:7], 16)
+    r = int(r1 + (r2 - r1) * alpha)
+    g = int(g1 + (g2 - g1) * alpha)
+    b = int(b1 + (b2 - b1) * alpha)
+    return f"#{r:02x}{g:02x}{b:02x}"
+
   def show_help(self):
     if self.help_window is not None:
       self.help_window.lift()
       return
 
-    self.btn_help.configure(state=tk.DISABLED)
+    self.animate_button_state(self.btn_help, tk.DISABLED)
 
     self.help_window = CTkToplevel(self.root)
     self.help_window.title("Руководство")
@@ -57,10 +83,10 @@ class QuadraticEquationSolver:
     help_label.configure(state=tk.DISABLED)
 
   def on_help_window_close(self):
-    self.btn_help.configure(state=tk.NORMAL)
     if self.help_window:
       self.help_window.destroy()
       self.help_window = None
+    self.animate_button_state(self.btn_help, tk.NORMAL)
 
   def create_widgets(self):
     self.btn_help = CTkButton(
@@ -113,37 +139,43 @@ class QuadraticEquationSolver:
 
     self.btn_discriminant = CTkButton(
       self.root, width=150, text="D", command=self.solve_with_discriminant,
-      font=("Calibri", 18, "bold"), corner_radius=7, height=25, state=tk.DISABLED
+      font=("Calibri", 18, "bold"), corner_radius=7, height=25, state=tk.DISABLED,
+      fg_color="transparent"
     )
     self.btn_discriminant.grid(row=7, column=0, sticky=tk.NW, padx=10, pady=4, ipady=4, ipadx=8)
 
     self.btn_half_discriminant = CTkButton(
       self.root, width=150, text="D/4", command=self.solve_with_half_discriminant,
-      font=("Calibri", 18, "bold"), corner_radius=7, height=25, state=tk.DISABLED
+      font=("Calibri", 18, "bold"), corner_radius=7, height=25, state=tk.DISABLED,
+      fg_color="transparent"
     )
     self.btn_half_discriminant.grid(row=7, column=0, sticky=tk.NW, padx=190, pady=4, ipady=4, ipadx=8)
 
     self.btn_vieta = CTkButton(
       self.root, width=150, text="Теорема Виета", command=self.solve_with_vieta,
-      font=("Calibri", 18, "bold"), corner_radius=7, height=25, state=tk.DISABLED
+      font=("Calibri", 18, "bold"), corner_radius=7, height=25, state=tk.DISABLED,
+      fg_color="transparent"
     )
     self.btn_vieta.grid(row=8, column=0, sticky=tk.NW, padx=10, pady=4, ipady=4, ipadx=8)
 
     self.btn_coefficient_transfer = CTkButton(
       self.root, width=150, text="Переброска", command=self.solve_with_coefficient_transfer,
-      font=("Calibri", 18, "bold"), corner_radius=7, height=25, state=tk.DISABLED
+      font=("Calibri", 18, "bold"), corner_radius=7, height=25, state=tk.DISABLED,
+      fg_color="transparent"
     )
     self.btn_coefficient_transfer.grid(row=8, column=0, sticky=tk.NW, padx=190, pady=4, ipady=4, ipadx=8)
 
     self.btn_coefficient_properties = CTkButton(
       self.root, width=150, text="a + b + c = 0", command=self.solve_with_coefficient_properties,
-      font=("Calibri", 18, "bold"), corner_radius=7, height=25, state=tk.DISABLED
+      font=("Calibri", 18, "bold"), corner_radius=7, height=25, state=tk.DISABLED,
+      fg_color="transparent"
     )
     self.btn_coefficient_properties.grid(row=9, column=0, sticky=tk.NW, padx=10, pady=4, ipady=4, ipadx=8)
 
     self.btn_incomplete = CTkButton(
       self.root, width=150, text="Неполное", command=self.solve_incomplete,
-      font=("Calibri", 18, "bold"), corner_radius=7, height=25, state=tk.DISABLED
+      font=("Calibri", 18, "bold"), corner_radius=7, height=25, state=tk.DISABLED,
+      fg_color="transparent"
     )
     self.btn_incomplete.grid(row=9, column=0, sticky=tk.NW, padx=190, pady=4, ipady=4, ipadx=8)
 
@@ -168,7 +200,7 @@ class QuadraticEquationSolver:
     self.clear_text()
     self.clear_entries()
     self.disable_all_methods()
-    self.btn_process.configure(state=tk.NORMAL)
+    self.animate_button_state(self.btn_process, tk.NORMAL)
     self.text_display.insert("1.0", "Введите коэффициенты уравнения")
     self.text_display.configure(state=tk.DISABLED)
     self.entry_a.focus()
@@ -177,13 +209,17 @@ class QuadraticEquationSolver:
     self.entry_c.configure(state=tk.NORMAL)
 
   def disable_all_methods(self):
-    self.btn_process.configure(state=tk.DISABLED)
-    self.btn_discriminant.configure(state=tk.DISABLED)
-    self.btn_half_discriminant.configure(state=tk.DISABLED)
-    self.btn_vieta.configure(state=tk.DISABLED)
-    self.btn_coefficient_transfer.configure(state=tk.DISABLED)
-    self.btn_coefficient_properties.configure(state=tk.DISABLED)
-    self.btn_incomplete.configure(state=tk.DISABLED)
+    buttons = [
+      self.btn_process,
+      self.btn_discriminant,
+      self.btn_half_discriminant,
+      self.btn_vieta,
+      self.btn_coefficient_transfer,
+      self.btn_coefficient_properties,
+      self.btn_incomplete
+    ]
+    for button in buttons:
+      self.animate_button_state(button, tk.DISABLED)
 
   def format_number(self, num):
     if num == int(num):
@@ -203,7 +239,7 @@ class QuadraticEquationSolver:
       elif (self.coeff_b == 0) or (self.coeff_c == 0):
         self.text_display.insert("1.0", "Вы ввели неполное уравнение.")
         self.text_display.insert(tk.END, "\nВыберите метод решения.")
-        self.btn_incomplete.configure(state=tk.NORMAL)
+        self.animate_button_state(self.btn_incomplete, tk.NORMAL)
         self.lock_inputs()
         return
 
@@ -235,20 +271,20 @@ class QuadraticEquationSolver:
       sqrt_d = math.sqrt(self.discriminant)
       self.root1 = (-self.coeff_b + sqrt_d) / (2 * self.coeff_a)
       self.root2 = (-self.coeff_b - sqrt_d) / (2 * self.coeff_a)
-      self.btn_discriminant.configure(state=tk.NORMAL)
+      self.animate_button_state(self.btn_discriminant, tk.NORMAL)
       sqrt_d_int = int(sqrt_d)
       root1_int = int(self.root1)
       root2_int = int(self.root2)
 
       if (root1_int == self.root1 or root2_int == self.root2 or sqrt_d_int == sqrt_d):
-        self.btn_coefficient_transfer.configure(state=tk.NORMAL)
+        self.animate_button_state(self.btn_coefficient_transfer, tk.NORMAL)
       if (self.coeff_a == 1) and root1_int == self.root1 and root2_int == self.root2:
-        self.btn_vieta.configure(state=tk.NORMAL)
+        self.animate_button_state(self.btn_vieta, tk.NORMAL)
       if ((self.coeff_a + self.coeff_b + self.coeff_c == 0) or
           (self.coeff_a - self.coeff_b + self.coeff_c == 0)):
-        self.btn_coefficient_properties.configure(state=tk.NORMAL)
+        self.animate_button_state(self.btn_coefficient_properties, tk.NORMAL)
       if (self.coeff_b != 0) and (self.coeff_b % 2 == 0):
-        self.btn_half_discriminant.configure(state=tk.NORMAL)
+        self.animate_button_state(self.btn_half_discriminant, tk.NORMAL)
 
     except ValueError:
       self.text_display.insert("1.0", "Убедитесь, что вы ввели все данные корректно!")
@@ -261,7 +297,7 @@ class QuadraticEquationSolver:
     self.entry_a.configure(state=tk.DISABLED)
     self.entry_b.configure(state=tk.DISABLED)
     self.entry_c.configure(state=tk.DISABLED)
-    self.btn_process.configure(state=tk.DISABLED)
+    self.animate_button_state(self.btn_process, tk.DISABLED)
 
   def solve_with_discriminant(self):
     self.clear_text()
