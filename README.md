@@ -19,7 +19,6 @@ Quadro — это приложение, объединяющее различн�
 
 ## Скриншоты
 
-|                                                                         |                                                                         |
+|  ![Приложение](https://github.com/user-attachments/assets/b2401fb4-5ef9-43a8-b893-a0083c26252a) | ![Дискриминант](https://github.com/user-attachments/assets/bf91395f-c472-472a-b359-1b21d02c8235)                                                                     |
 | :----------------------------------------------------------------------: | :----------------------------------------------------------------------: |
-|   ![Приложение](https://github.com/user-attachments/assets/b2401fb4-5ef9-43a8-b893-a0083c26252a)   | ![Дискриминант](https://github.com/user-attachments/assets/d120c6bc-266c-47d8-b6fd-3044884c0225) |
-| ![Теорема Виета](https://github.com/user-attachments/assets/a4fec73f-78fa-4d8e-8d7b-9b30e36336f2) | ![Неполное квадратное уравнение](https://github.com/user-attachments/assets/34f90b96-bc85-4d0e-b98e-237b29094098) |
+| ![Теорема Виета](https://github.com/user-attachments/assets/fdb0fd15-d64b-4f2d-b028-62f9fcf5f02b) | ![Неполное квадратное уравнение](https://github.com/user-attachments/assets/4538f546-74fe-4d44-899d-5ad4c31e7d76) |
