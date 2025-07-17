@@ -1,7 +1,7 @@
 import tkinter as tk
 import math
 import os
-from customtkinter import CTk, CTkTextbox, CTkLabel, CTkEntry, CTkButton, CTkToplevel
+from customtkinter import CTk, CTkTextbox, CTkLabel, CTkEntry, CTkButton, CTkToplevel, CTkComboBox
 from customtkinter import set_appearance_mode, set_default_color_theme
 
 class QuadraticEquationSolver:
@@ -59,8 +59,8 @@ class QuadraticEquationSolver:
     button.configure(state=target_state)
 
   def interpolate_color(self, color1, color2, alpha):
-    red_1, green_1, blue_1 = int(color1[0][1:3], 16), int(color1[0][3:5], 16), int(color1[0][5:7], 16)
-    red_2, green_2, blue_2 = int(color2[0][1:3], 16), int(color2[0][3:5], 16), int(color2[0][5:7], 16)
+    red_1, green_1, blue_1 = int(color1[0][1:3], 16), int(color1[1][3:5], 16), int(color1[2][5:7], 16)
+    red_2, green_2, blue_2 = int(color2[0][1:3], 16), int(color2[1][3:5], 16), int(color2[2][5:7], 16)
     red = int(red_1 + (red_2 - red_1) * alpha)
     green = int(green_1 + (green_2 - green_1) * alpha)
     blue = int(blue_1 + (blue_2 - blue_1) * alpha)
@@ -98,6 +98,11 @@ class QuadraticEquationSolver:
     help_label.insert("1.0", help_text)
     help_label.configure(state=tk.DISABLED)
 
+  def on_help_window_close(self):
+    self.animate_button_state(self.btn_help, tk.NORMAL)
+    self.help_window.destroy()
+    self.help_window = None
+
   def show_theory(self):
     if self.theory_window is not None:
       self.theory_window.lift()
@@ -107,22 +112,66 @@ class QuadraticEquationSolver:
 
     self.theory_window = CTkToplevel(self.root)
     self.theory_window.title("Теория")
-    self.theory_window.geometry("500x340")
+    self.theory_window.geometry("500x370")
     self.theory_window.resizable(width=False, height=False)
     self.theory_window.protocol("WM_DELETE_WINDOW", self.on_theory_window_close)
 
-    theory_text = self.load_text_from_file("theory.txt")
-    
-    theory_label = CTkTextbox(self.theory_window, width=480, height=320, wrap=tk.WORD, font=("Calibri", 18))
-    theory_label.pack(padx=10, pady=10)
-    theory_label.insert("1.0", theory_text)
-    theory_label.configure(state=tk.DISABLED)
+    label_title = CTkLabel(
+      self.theory_window, 
+      text="Выберите раздел:", 
+      font=("Calibri", 18)
+    )
+    label_title.pack(padx=10, pady=(10, 0), anchor=tk.W)
 
-  def on_help_window_close(self):
-    if self.help_window:
-      self.help_window.destroy()
-      self.help_window = None
-    self.animate_button_state(self.btn_help, tk.NORMAL)
+    self.theory_sections = [
+      "1. Понятие квадратного уравнения",
+      "2. Понятие дискриминанта",
+      "3. Метод решения через половину коэффициента b",
+      "4. Теорема Виета",
+      "5. Метод переброски",
+      "6. Свойства коэффициентов",
+      "7. Решение неполных квадратных уравнений"
+    ]
+    self.theory_combobox = CTkComboBox(
+      self.theory_window,
+      values=self.theory_sections,
+      font=("Calibri", 18),
+      command=self.load_theory_section,
+      state="readonly"
+    )
+    self.theory_combobox.set(self.theory_sections[0])
+    self.theory_combobox.pack(padx=10, pady=(0, 10), fill=tk.X)
+
+    self.theory_textbox = CTkTextbox(
+      self.theory_window, 
+      width=480, 
+      height=300, 
+      wrap=tk.WORD, 
+      font=("Calibri", 18)
+    )
+    self.theory_textbox.pack(padx=10, pady=(0, 10))
+    
+    self.full_theory_text = self.load_text_from_file("theory.txt")
+    self.theory_textbox.configure(state=tk.NORMAL)
+    self.theory_textbox.insert("1.0", self.full_theory_text)
+    self.load_theory_section(self.theory_sections[0])
+    self.theory_textbox.configure(state=tk.DISABLED)
+
+  def load_theory_section(self, section_name):
+    if not hasattr(self, 'full_theory_text'):
+      return
+
+    self.theory_textbox.configure(state=tk.NORMAL)
+    
+    start_index = self.full_theory_text.find(section_name)
+    
+    if start_index != -1:
+      line_start = self.full_theory_text.count('\n', 0, start_index) + 1
+      self.theory_textbox.see(f"{line_start}.0")
+    else:
+      self.theory_textbox.see("1.0")
+    
+    self.theory_textbox.configure(state=tk.DISABLED)
 
   def on_theory_window_close(self):
     if self.theory_window:
