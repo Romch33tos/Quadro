@@ -10,6 +10,7 @@ class QuadraticEquationSolver:
     self.root.title("Quadro")
     self.root.geometry("370x505")
     self.root.resizable(width=False, height=False)
+    
     set_appearance_mode("dark")
     set_default_color_theme("blue")
 
@@ -86,7 +87,7 @@ class QuadraticEquationSolver:
     self.animate_button_state(self.btn_help, tk.DISABLED)
 
     self.help_window = CTkToplevel(self.root)
-    self.help_window.title("Руководство")
+    self.help_window.title("Справка")
     self.help_window.geometry("500x340")
     self.help_window.resizable(width=False, height=False)
     self.help_window.protocol("WM_DELETE_WINDOW", self.on_help_window_close)
@@ -132,6 +133,7 @@ class QuadraticEquationSolver:
       "6. Свойства коэффициентов",
       "7. Решение неполных квадратных уравнений"
     ]
+    
     self.theory_combobox = CTkComboBox(
       self.theory_window,
       values=self.theory_sections,
