@@ -1,6 +1,7 @@
 import tkinter as tk
 import math
-from customtkinter import CTk, CTkTextbox, CTkLabel, CTkEntry, CTkButton, CTkToplevel
+import os
+from customtkinter import CTk, CTkTextbox, CTkLabel, CTkEntry, CTkButton, CTkToplevel, CTkComboBox
 from customtkinter import set_appearance_mode, set_default_color_theme
 
 class QuadraticEquationSolver:
@@ -9,6 +10,7 @@ class QuadraticEquationSolver:
     self.root.title("Quadro")
     self.root.geometry("370x505")
     self.root.resizable(width=False, height=False)
+    
     set_appearance_mode("dark")
     set_default_color_theme("blue")
 
@@ -26,12 +28,13 @@ class QuadraticEquationSolver:
     self.root2 = 0
 
     self.help_window = None
+    self.theory_window = None
 
     self.create_widgets()
     self.root.mainloop()
 
   def animate_button_state(self, button, target_state):
-    if button == self.btn_help:
+    if button in [self.btn_help, self.btn_theory]:
       if target_state == tk.NORMAL:
         button.configure(text_color=self.text_color_active)
       else:
@@ -57,12 +60,24 @@ class QuadraticEquationSolver:
     button.configure(state=target_state)
 
   def interpolate_color(self, color1, color2, alpha):
-    red_1, green_1, blue_1 = int(color1[0][1:3], 16), int(color1[0][3:5], 16), int(color1[0][5:7], 16)
-    red_2, green_2, blue_2 = int(color2[0][1:3], 16), int(color2[0][3:5], 16), int(color2[0][5:7], 16)
+    red_1, green_1, blue_1 = int(color1[0][1:3], 16), int(color1[1][3:5], 16), int(color1[2][5:7], 16)
+    red_2, green_2, blue_2 = int(color2[0][1:3], 16), int(color2[1][3:5], 16), int(color2[2][5:7], 16)
     red = int(red_1 + (red_2 - red_1) * alpha)
     green = int(green_1 + (green_2 - green_1) * alpha)
     blue = int(blue_1 + (blue_2 - blue_1) * alpha)
     return f"#{red:02x}{green:02x}{blue:02x}"
+
+  def load_text_from_file(self, filename):
+    try:
+      base_dir = os.path.dirname(os.path.abspath(__file__))
+      resources_dir = os.path.join(base_dir, "resources")
+      filepath = os.path.join(resources_dir, filename)
+      
+      with open(filepath, "r", encoding="utf-8") as file:
+        return file.read()
+    except Exception as e:
+      print(f"Error loading file {filename}: {e}")
+      return f"Не удалось загрузить содержимое файла {filename}"
 
   def show_help(self):
     if self.help_window is not None:
@@ -72,36 +87,99 @@ class QuadraticEquationSolver:
     self.animate_button_state(self.btn_help, tk.DISABLED)
 
     self.help_window = CTkToplevel(self.root)
-    self.help_window.title("Руководство")
+    self.help_window.title("Справка")
     self.help_window.geometry("500x340")
     self.help_window.resizable(width=False, height=False)
-
     self.help_window.protocol("WM_DELETE_WINDOW", self.on_help_window_close)
 
-    help_text = """Руководство по использованию приложения:
-
-1. Введите коэффициенты уравнения в поля ввода.
-2. Нажмите кнопку "Готово" или Enter.
-3. Выберите доступный метод решения.
-4. Используйте кнопку "Очистить все" для очистки полей.
-
-Правила ввода:
-
-1. Если один из коэффициентов отсутствует, вместо него необходимо ввести 0.
-2. Коэффициент "а" не может быть равен 0.
-3. Нельзя вводить посторонние символы, помимо цифр и знака "-".
-"""
-
+    help_text = self.load_text_from_file("help.txt")
+    
     help_label = CTkTextbox(self.help_window, width=480, height=320, wrap=tk.WORD, font=("Calibri", 18))
     help_label.pack(padx=10, pady=10)
     help_label.insert("1.0", help_text)
     help_label.configure(state=tk.DISABLED)
 
   def on_help_window_close(self):
-    if self.help_window:
-      self.help_window.destroy()
-      self.help_window = None
     self.animate_button_state(self.btn_help, tk.NORMAL)
+    self.help_window.destroy()
+    self.help_window = None
+
+  def show_theory(self):
+    if self.theory_window is not None:
+      self.theory_window.lift()
+      return
+
+    self.animate_button_state(self.btn_theory, tk.DISABLED)
+
+    self.theory_window = CTkToplevel(self.root)
+    self.theory_window.title("Теория")
+    self.theory_window.geometry("500x370")
+    self.theory_window.resizable(width=False, height=False)
+    self.theory_window.protocol("WM_DELETE_WINDOW", self.on_theory_window_close)
+
+    label_title = CTkLabel(
+      self.theory_window, 
+      text="Выберите раздел:", 
+      font=("Calibri", 18)
+    )
+    label_title.pack(padx=10, pady=(10, 0), anchor=tk.W)
+
+    self.theory_sections = [
+      "1. Понятие квадратного уравнения",
+      "2. Понятие дискриминанта",
+      "3. Метод решения через половину коэффициента b",
+      "4. Теорема Виета",
+      "5. Метод переброски",
+      "6. Свойства коэффициентов",
+      "7. Решение неполных квадратных уравнений"
+    ]
+    
+    self.theory_combobox = CTkComboBox(
+      self.theory_window,
+      values=self.theory_sections,
+      font=("Calibri", 18),
+      command=self.load_theory_section,
+      state="readonly"
+    )
+    self.theory_combobox.set(self.theory_sections[0])
+    self.theory_combobox.pack(padx=10, pady=(0, 10), fill=tk.X)
+
+    self.theory_textbox = CTkTextbox(
+      self.theory_window, 
+      width=480, 
+      height=300, 
+      wrap=tk.WORD, 
+      font=("Calibri", 18)
+    )
+    self.theory_textbox.pack(padx=10, pady=(0, 10))
+    
+    self.full_theory_text = self.load_text_from_file("theory.txt")
+    self.theory_textbox.configure(state=tk.NORMAL)
+    self.theory_textbox.insert("1.0", self.full_theory_text)
+    self.load_theory_section(self.theory_sections[0])
+    self.theory_textbox.configure(state=tk.DISABLED)
+
+  def load_theory_section(self, section_name):
+    if not hasattr(self, 'full_theory_text'):
+      return
+
+    self.theory_textbox.configure(state=tk.NORMAL)
+    
+    start_index = self.full_theory_text.find(section_name)
+    
+    if start_index != -1:
+      line_start = self.full_theory_text.count('\n', 0, start_index) + 1
+      self.theory_textbox.see(f"{line_start}.0")
+    else:
+      self.theory_textbox.see("1.0")
+    
+    self.theory_textbox.configure(state=tk.DISABLED)
+
+  def on_theory_window_close(self):
+    if self.theory_window:
+      self.theory_window.destroy()
+      self.theory_window = None
+    self.animate_button_state(self.btn_theory, tk.NORMAL)
 
   def create_widgets(self):
     self.btn_help = CTkButton(
@@ -110,6 +188,13 @@ class QuadraticEquationSolver:
       text_color=self.text_color_active
     )
     self.btn_help.grid(row=0, column=0, sticky=tk.NW, padx=10, pady=7)
+
+    self.btn_theory = CTkButton(
+      self.root, width=80, text="Теория", command=self.show_theory,
+      font=("Calibri", 18), fg_color="transparent", hover=False,
+      text_color=self.text_color_active
+    )
+    self.btn_theory.grid(row=0, column=0, sticky=tk.NW, padx=100, pady=7)
 
     self.text_display = CTkTextbox(self.root, width=340, height=120, wrap=tk.WORD, font=("Calibri", 18))
     self.text_display.grid(row=1, column=0, padx=10, pady=7, sticky=tk.NW, ipadx=5)
@@ -271,12 +356,12 @@ class QuadraticEquationSolver:
 
       if (self.coeff_a > 0 and self.coeff_c > 0) or (self.coeff_a < 0 and self.coeff_c < 0):
         self.text_display.insert("1.0",
-          f"D = {self.coeff_b}² - 4 × {self.coeff_a} × {self.coeff_c} = "
+          f"D = {self.coeff_b}² - 4 · {self.coeff_a} · {self.coeff_c} = "
           f"{self.coeff_b**2} - {4 * self.coeff_a * self.coeff_c} = {formatted_d}"
         )
       elif (self.coeff_a < 0) ^ (self.coeff_c < 0):
         self.text_display.insert("1.0",
-          f"D = {self.coeff_b}² + 4 × {abs(self.coeff_a)} × {abs(self.coeff_c)} = "
+          f"D = {self.coeff_b}² + 4 · {abs(self.coeff_a)} · {abs(self.coeff_c)} = "
           f"{self.coeff_b**2} + {abs(4 * self.coeff_a * self.coeff_c)} = {formatted_d}"
         )
 
@@ -332,22 +417,22 @@ class QuadraticEquationSolver:
 
     if (self.coeff_a > 0 and self.coeff_c > 0) or (self.coeff_a < 0 and self.coeff_c < 0):
       self.text_display.insert("1.0",
-        f"D = {self.coeff_b}² - 4 × {self.coeff_a} × {self.coeff_c} = "
+        f"D = {self.coeff_b}² - 4 · {self.coeff_a} · {self.coeff_c} = "
         f"{self.coeff_b**2} - {4 * self.coeff_a * self.coeff_c} = {formatted_d}"
       )
     elif (self.coeff_a < 0) ^ (self.coeff_c < 0):
       self.text_display.insert("1.0",
-        f"D = {self.coeff_b}² + 4 × {abs(self.coeff_a)} × {abs(self.coeff_c)} = "
+        f"D = {self.coeff_b}² + 4 · {abs(self.coeff_a)} · {abs(self.coeff_c)} = "
         f"{self.coeff_b**2} + {abs(4 * self.coeff_a * self.coeff_c)} = {formatted_d}"
       )
 
     self.text_display.insert(tk.END, "\nПо формуле корней:")
     self.text_display.insert(tk.END,
-      f"\nx₁ = ({-self.coeff_b} + {self.format_number(sqrt_d)}) / (2 × {self.coeff_a}) = "
+      f"\nx₁ = ({-self.coeff_b} + {self.format_number(sqrt_d)}) / (2 · {self.coeff_a}) = "
       f"{self.format_number(-self.coeff_b + sqrt_d)} / {2 * self.coeff_a} = {formatted_root1}"
     )
     self.text_display.insert(tk.END,
-      f"\nx₂ = ({-self.coeff_b} - {self.format_number(sqrt_d)}) / (2 × {self.coeff_a}) = "
+      f"\nx₂ = ({-self.coeff_b} - {self.format_number(sqrt_d)}) / (2 · {self.coeff_a}) = "
       f"{self.format_number(-self.coeff_b - sqrt_d)} / {2 * self.coeff_a} = {formatted_root2}"
     )
     self.text_display.configure(state=tk.DISABLED)
@@ -367,12 +452,12 @@ class QuadraticEquationSolver:
 
     if (self.coeff_a > 0 and self.coeff_c > 0) or (self.coeff_a < 0 and self.coeff_c < 0):
       self.text_display.insert("1.0",
-        f"k = {self.format_number(half_b)}, D/4 = {self.format_number(half_b)}² - {self.coeff_a} × {self.coeff_c} = "
+        f"k = {self.format_number(half_b)}, D/4 = {self.format_number(half_b)}² - {self.coeff_a} · {self.coeff_c} = "
         f"{self.format_number(half_b**2)} - {self.coeff_a * self.coeff_c} = {formatted_d4}"
       )
     elif (self.coeff_a < 0) ^ (self.coeff_c < 0):
       self.text_display.insert("1.0",
-        f"k = {self.format_number(half_b)}, D/4 = {self.format_number(half_b)}² + {abs(self.coeff_a)} × {abs(self.coeff_c)} = "
+        f"k = {self.format_number(half_b)}, D/4 = {self.format_number(half_b)}² + {abs(self.coeff_a)} · {abs(self.coeff_c)} = "
         f"{self.format_number(half_b**2)} + {abs(self.coeff_a * self.coeff_c)} = {formatted_d4}"
       )
 
@@ -395,7 +480,7 @@ class QuadraticEquationSolver:
 
     self.text_display.insert("1.0", "По теореме Виета:")
     self.text_display.insert(tk.END, f"\nx₁ + x₂ = {-self.coeff_b}")
-    self.text_display.insert(tk.END, f"\nx₁ × x₂ = {self.coeff_c}")
+    self.text_display.insert(tk.END, f"\nx₁ · x₂ = {self.coeff_c}")
     self.text_display.insert(tk.END, f"\nx₁ = {formatted_root1}, x₂ = {formatted_root2}")
     self.text_display.configure(state=tk.DISABLED)
 
@@ -407,7 +492,7 @@ class QuadraticEquationSolver:
 
     self.text_display.insert("1.0", "Методом переброски коэффициента:")
     self.text_display.insert(tk.END, f"\nx₁ + x₂ = {-self.coeff_b}")
-    self.text_display.insert(tk.END, f"\nx₁ × x₂ = {self.coeff_c * self.coeff_a}")
+    self.text_display.insert(tk.END, f"\nx₁ · x₂ = {self.coeff_c * self.coeff_a}")
     self.text_display.insert(tk.END,
       f"\nx₁ = {self.format_number(self.root1 * self.coeff_a)} / {self.coeff_a} = {formatted_root1}, "
       f"x₂ = {self.format_number(self.root2 * self.coeff_a)} / {self.coeff_a} = {formatted_root2}"
@@ -471,7 +556,7 @@ class QuadraticEquationSolver:
       ratio = self.coeff_b / self.coeff_a
       formatted_ratio = self.format_number(abs(ratio))
 
-      self.text_display.insert(tk.END, f"\n{a_sign}x × (x {sign} {formatted_ratio}) = 0")
+      self.text_display.insert(tk.END, f"\n{a_sign}x · (x {sign} {formatted_ratio}) = 0")
       self.text_display.insert(tk.END, f"\n{a_sign}x = 0, (x {sign} {formatted_ratio}) = 0")
 
       root1 = 0
