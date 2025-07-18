@@ -8,7 +8,7 @@ class QuadraticEquationSolver:
   def __init__(self):
     self.root = CTk()
     self.root.title("Quadro")
-    self.root.geometry("370x505")
+    self.root.geometry("370x520")
     self.root.resizable(width=False, height=False)
     
     self.dark_mode = False
@@ -81,7 +81,7 @@ class QuadraticEquationSolver:
         self.root.update()
         self.root.after(20)
     else:
-      button.configure(fg_color="transparent", border_color=self.border_color, border_width=1)
+      button.configure(fg_color="transparent", border_color=self.border_color, border_width=2)
     button.configure(state=target_state)
 
   def interpolate_color(self, color1, color2, alpha):
@@ -269,7 +269,7 @@ class QuadraticEquationSolver:
       self.root, width=150, text="Готово", command=self.process_equation,
       font=("Calibri", 18, "bold"), corner_radius=7, height=25,
       fg_color=self.active_color, hover_color=self.hover_color,
-      border_color=self.border_color, border_width=1
+      border_color=self.border_color, border_width=2
     )
     self.btn_process.grid(row=5, column=0, sticky=tk.NW, padx=190, pady=4, ipady=4, ipadx=8)
 
@@ -277,7 +277,7 @@ class QuadraticEquationSolver:
       self.root, width=150, text="Очистить все", command=self.clear_all,
       font=("Calibri", 18, "bold"), corner_radius=7, height=25,
       fg_color=self.active_color, hover_color=self.hover_color,
-      border_color=self.border_color, border_width=1
+      border_color=self.border_color, border_width=2
     )
     self.btn_clear.grid(row=5, column=0, sticky=tk.NW, padx=10, pady=4, ipady=4, ipadx=8)
 
@@ -287,42 +287,42 @@ class QuadraticEquationSolver:
     self.btn_discriminant = CTkButton(
       self.root, width=150, text="D", command=self.solve_with_discriminant,
       font=("Calibri", 18, "bold"), corner_radius=7, height=25, state=tk.DISABLED,
-      fg_color="transparent", border_color=self.border_color, border_width=1
+      fg_color="transparent", border_color=self.border_color, border_width=2
     )
     self.btn_discriminant.grid(row=7, column=0, sticky=tk.NW, padx=10, pady=4, ipady=4, ipadx=8)
 
     self.btn_half_discriminant = CTkButton(
       self.root, width=150, text="D/4", command=self.solve_with_half_discriminant,
       font=("Calibri", 18, "bold"), corner_radius=7, height=25, state=tk.DISABLED,
-      fg_color="transparent", border_color=self.border_color, border_width=1
+      fg_color="transparent", border_color=self.border_color, border_width=2
     )
     self.btn_half_discriminant.grid(row=7, column=0, sticky=tk.NW, padx=190, pady=4, ipady=4, ipadx=8)
 
     self.btn_vieta = CTkButton(
       self.root, width=150, text="Теорема Виета", command=self.solve_with_vieta,
       font=("Calibri", 18, "bold"), corner_radius=7, height=25, state=tk.DISABLED,
-      fg_color="transparent", border_color=self.border_color, border_width=1
+      fg_color="transparent", border_color=self.border_color, border_width=2
     )
     self.btn_vieta.grid(row=8, column=0, sticky=tk.NW, padx=10, pady=4, ipady=4, ipadx=8)
 
     self.btn_coefficient_transfer = CTkButton(
       self.root, width=150, text="Переброска", command=self.solve_with_coefficient_transfer,
       font=("Calibri", 18, "bold"), corner_radius=7, height=25, state=tk.DISABLED,
-      fg_color="transparent", border_color=self.border_color, border_width=1
+      fg_color="transparent", border_color=self.border_color, border_width=2
     )
     self.btn_coefficient_transfer.grid(row=8, column=0, sticky=tk.NW, padx=190, pady=4, ipady=4, ipadx=8)
 
     self.btn_coefficient_properties = CTkButton(
       self.root, width=150, text="a + b + c = 0", command=self.solve_with_coefficient_properties,
       font=("Calibri", 18, "bold"), corner_radius=7, height=25, state=tk.DISABLED,
-      fg_color="transparent", border_color=self.border_color, border_width=1
+      fg_color="transparent", border_color=self.border_color, border_width=2
     )
     self.btn_coefficient_properties.grid(row=9, column=0, sticky=tk.NW, padx=10, pady=4, ipady=4, ipadx=8)
 
     self.btn_incomplete = CTkButton(
       self.root, width=150, text="Неполное", command=self.solve_incomplete,
       font=("Calibri", 18, "bold"), corner_radius=7, height=25, state=tk.DISABLED,
-      fg_color="transparent", border_color=self.border_color, border_width=1
+      fg_color="transparent", border_color=self.border_color, border_width=2
     )
     self.btn_incomplete.grid(row=9, column=0, sticky=tk.NW, padx=190, pady=4, ipady=4, ipadx=8)
 
