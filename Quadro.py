@@ -1,17 +1,18 @@
 import tkinter as tk
 import math
 import os
-from customtkinter import CTk, CTkTextbox, CTkLabel, CTkEntry, CTkButton, CTkToplevel, CTkComboBox
+from customtkinter import CTk, CTkTextbox, CTkLabel, CTkEntry, CTkButton, CTkToplevel, CTkComboBox, CTkSwitch
 from customtkinter import set_appearance_mode, set_default_color_theme
 
 class QuadraticEquationSolver:
   def __init__(self):
     self.root = CTk()
     self.root.title("Quadro")
-    self.root.geometry("370x505")
+    self.root.geometry("370x520")
     self.root.resizable(width=False, height=False)
     
-    set_appearance_mode("dark")
+    self.dark_mode = False
+    set_appearance_mode("light")
     set_default_color_theme("blue")
 
     self.active_color = ("#2b7de9", "#1a5cb3")  
@@ -19,6 +20,8 @@ class QuadraticEquationSolver:
     self.border_color = self.active_color       
     self.text_color_active = "white"            
     self.text_color_disabled = ("gray70", "gray40") 
+    self.label_color = "black"  
+    self.button_text_color = "black" 
 
     self.coeff_a = 0
     self.coeff_b = 0
@@ -33,10 +36,32 @@ class QuadraticEquationSolver:
     self.create_widgets()
     self.root.mainloop()
 
+  def toggle_theme(self):
+    self.dark_mode = not self.dark_mode
+    if self.dark_mode:
+      set_appearance_mode("dark")
+      self.label_color = "white"
+      self.button_text_color = "white"
+    else:
+      set_appearance_mode("light")
+      self.label_color = "black"
+      self.button_text_color = "black"
+    
+    for widget in self.root.winfo_children():
+      if isinstance(widget, CTkLabel):
+        widget.configure(text_color=self.label_color)
+      elif widget in [self.btn_help, self.btn_theory]:
+        widget.configure(text_color=self.button_text_color)
+    
+    for alpha in range(0, 11):
+      self.root.attributes('-alpha', alpha/10)
+      self.root.update()
+      self.root.after(30)
+
   def animate_button_state(self, button, target_state):
     if button in [self.btn_help, self.btn_theory]:
       if target_state == tk.NORMAL:
-        button.configure(text_color=self.text_color_active)
+        button.configure(text_color=self.button_text_color)
       else:
         button.configure(text_color=self.text_color_disabled)
       button.configure(state=target_state)
@@ -56,7 +81,7 @@ class QuadraticEquationSolver:
         self.root.update()
         self.root.after(20)
     else:
-      button.configure(fg_color="transparent", border_color=self.border_color, border_width=1)
+      button.configure(fg_color="transparent", border_color=self.border_color, border_width=2)
     button.configure(state=target_state)
 
   def interpolate_color(self, color1, color2, alpha):
@@ -185,16 +210,33 @@ class QuadraticEquationSolver:
     self.btn_help = CTkButton(
       self.root, width=80, text="Справка", command=self.show_help,
       font=("Calibri", 18), fg_color="transparent", hover=False,
-      text_color=self.text_color_active
+      text_color=self.button_text_color
     )
     self.btn_help.grid(row=0, column=0, sticky=tk.NW, padx=10, pady=7)
 
     self.btn_theory = CTkButton(
       self.root, width=80, text="Теория", command=self.show_theory,
       font=("Calibri", 18), fg_color="transparent", hover=False,
-      text_color=self.text_color_active
+      text_color=self.button_text_color
     )
-    self.btn_theory.grid(row=0, column=0, sticky=tk.NW, padx=100, pady=7)
+    self.btn_theory.grid(row=0, column=0, sticky=tk.NW, padx=90, pady=7)
+
+    self.theme_label = CTkLabel(
+      self.root, 
+      text="Темная тема", 
+      font=("Calibri", 18),
+      text_color=self.label_color
+    )
+    self.theme_label.grid(row=0, column=0, sticky=tk.NW, padx=180, pady=7)
+
+    self.theme_switch = CTkSwitch(
+      self.root, 
+      text="", 
+      command=self.toggle_theme,
+      width=40
+    )
+    self.theme_switch.grid(row=0, column=0, sticky=tk.NW, padx=290, pady=10)
+    self.theme_switch.select() if self.dark_mode else self.theme_switch.deselect()
 
     self.text_display = CTkTextbox(self.root, width=340, height=120, wrap=tk.WORD, font=("Calibri", 18))
     self.text_display.grid(row=1, column=0, padx=10, pady=7, sticky=tk.NW, ipadx=5)
@@ -227,7 +269,7 @@ class QuadraticEquationSolver:
       self.root, width=150, text="Готово", command=self.process_equation,
       font=("Calibri", 18, "bold"), corner_radius=7, height=25,
       fg_color=self.active_color, hover_color=self.hover_color,
-      border_color=self.border_color, border_width=1
+      border_color=self.border_color, border_width=2
     )
     self.btn_process.grid(row=5, column=0, sticky=tk.NW, padx=190, pady=4, ipady=4, ipadx=8)
 
@@ -235,7 +277,7 @@ class QuadraticEquationSolver:
       self.root, width=150, text="Очистить все", command=self.clear_all,
       font=("Calibri", 18, "bold"), corner_radius=7, height=25,
       fg_color=self.active_color, hover_color=self.hover_color,
-      border_color=self.border_color, border_width=1
+      border_color=self.border_color, border_width=2
     )
     self.btn_clear.grid(row=5, column=0, sticky=tk.NW, padx=10, pady=4, ipady=4, ipadx=8)
 
@@ -245,42 +287,42 @@ class QuadraticEquationSolver:
     self.btn_discriminant = CTkButton(
       self.root, width=150, text="D", command=self.solve_with_discriminant,
       font=("Calibri", 18, "bold"), corner_radius=7, height=25, state=tk.DISABLED,
-      fg_color="transparent", border_color=self.border_color, border_width=1
+      fg_color="transparent", border_color=self.border_color, border_width=2
     )
     self.btn_discriminant.grid(row=7, column=0, sticky=tk.NW, padx=10, pady=4, ipady=4, ipadx=8)
 
     self.btn_half_discriminant = CTkButton(
       self.root, width=150, text="D/4", command=self.solve_with_half_discriminant,
       font=("Calibri", 18, "bold"), corner_radius=7, height=25, state=tk.DISABLED,
-      fg_color="transparent", border_color=self.border_color, border_width=1
+      fg_color="transparent", border_color=self.border_color, border_width=2
     )
     self.btn_half_discriminant.grid(row=7, column=0, sticky=tk.NW, padx=190, pady=4, ipady=4, ipadx=8)
 
     self.btn_vieta = CTkButton(
       self.root, width=150, text="Теорема Виета", command=self.solve_with_vieta,
       font=("Calibri", 18, "bold"), corner_radius=7, height=25, state=tk.DISABLED,
-      fg_color="transparent", border_color=self.border_color, border_width=1
+      fg_color="transparent", border_color=self.border_color, border_width=2
     )
     self.btn_vieta.grid(row=8, column=0, sticky=tk.NW, padx=10, pady=4, ipady=4, ipadx=8)
 
     self.btn_coefficient_transfer = CTkButton(
       self.root, width=150, text="Переброска", command=self.solve_with_coefficient_transfer,
       font=("Calibri", 18, "bold"), corner_radius=7, height=25, state=tk.DISABLED,
-      fg_color="transparent", border_color=self.border_color, border_width=1
+      fg_color="transparent", border_color=self.border_color, border_width=2
     )
     self.btn_coefficient_transfer.grid(row=8, column=0, sticky=tk.NW, padx=190, pady=4, ipady=4, ipadx=8)
 
     self.btn_coefficient_properties = CTkButton(
       self.root, width=150, text="a + b + c = 0", command=self.solve_with_coefficient_properties,
       font=("Calibri", 18, "bold"), corner_radius=7, height=25, state=tk.DISABLED,
-      fg_color="transparent", border_color=self.border_color, border_width=1
+      fg_color="transparent", border_color=self.border_color, border_width=2
     )
     self.btn_coefficient_properties.grid(row=9, column=0, sticky=tk.NW, padx=10, pady=4, ipady=4, ipadx=8)
 
     self.btn_incomplete = CTkButton(
       self.root, width=150, text="Неполное", command=self.solve_incomplete,
       font=("Calibri", 18, "bold"), corner_radius=7, height=25, state=tk.DISABLED,
-      fg_color="transparent", border_color=self.border_color, border_width=1
+      fg_color="transparent", border_color=self.border_color, border_width=2
     )
     self.btn_incomplete.grid(row=9, column=0, sticky=tk.NW, padx=190, pady=4, ipady=4, ipadx=8)
 
