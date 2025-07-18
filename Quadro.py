@@ -1,7 +1,7 @@
 import tkinter as tk
 import math
 import os
-from customtkinter import CTk, CTkTextbox, CTkLabel, CTkEntry, CTkButton, CTkToplevel, CTkComboBox
+from customtkinter import CTk, CTkTextbox, CTkLabel, CTkEntry, CTkButton, CTkToplevel, CTkComboBox, CTkSwitch
 from customtkinter import set_appearance_mode, set_default_color_theme
 
 class QuadraticEquationSolver:
@@ -11,6 +11,7 @@ class QuadraticEquationSolver:
     self.root.geometry("370x505")
     self.root.resizable(width=False, height=False)
     
+    self.dark_mode = True
     set_appearance_mode("dark")
     set_default_color_theme("blue")
 
@@ -19,6 +20,8 @@ class QuadraticEquationSolver:
     self.border_color = self.active_color       
     self.text_color_active = "white"            
     self.text_color_disabled = ("gray70", "gray40") 
+    self.label_color = "white" 
+    self.button_text_color = "white" 
 
     self.coeff_a = 0
     self.coeff_b = 0
@@ -33,10 +36,32 @@ class QuadraticEquationSolver:
     self.create_widgets()
     self.root.mainloop()
 
+  def toggle_theme(self):
+    self.dark_mode = not self.dark_mode
+    if self.dark_mode:
+      set_appearance_mode("dark")
+      self.label_color = "white"
+      self.button_text_color = "white"
+    else:
+      set_appearance_mode("light")
+      self.label_color = "black"
+      self.button_text_color = "black"
+    
+    for widget in self.root.winfo_children():
+      if isinstance(widget, CTkLabel):
+        widget.configure(text_color=self.label_color)
+      elif widget in [self.btn_help, self.btn_theory]:
+        widget.configure(text_color=self.button_text_color)
+    
+    for alpha in range(0, 11):
+      self.root.attributes('-alpha', alpha/10)
+      self.root.update()
+      self.root.after(30)
+
   def animate_button_state(self, button, target_state):
     if button in [self.btn_help, self.btn_theory]:
       if target_state == tk.NORMAL:
-        button.configure(text_color=self.text_color_active)
+        button.configure(text_color=self.button_text_color)
       else:
         button.configure(text_color=self.text_color_disabled)
       button.configure(state=target_state)
@@ -185,16 +210,33 @@ class QuadraticEquationSolver:
     self.btn_help = CTkButton(
       self.root, width=80, text="Справка", command=self.show_help,
       font=("Calibri", 18), fg_color="transparent", hover=False,
-      text_color=self.text_color_active
+      text_color=self.button_text_color
     )
     self.btn_help.grid(row=0, column=0, sticky=tk.NW, padx=10, pady=7)
 
     self.btn_theory = CTkButton(
       self.root, width=80, text="Теория", command=self.show_theory,
       font=("Calibri", 18), fg_color="transparent", hover=False,
-      text_color=self.text_color_active
+      text_color=self.button_text_color
     )
-    self.btn_theory.grid(row=0, column=0, sticky=tk.NW, padx=100, pady=7)
+    self.btn_theory.grid(row=0, column=0, sticky=tk.NW, padx=90, pady=7)
+
+    self.theme_label = CTkLabel(
+      self.root, 
+      text="Темная тема", 
+      font=("Calibri", 18),
+      text_color=self.label_color
+    )
+    self.theme_label.grid(row=0, column=0, sticky=tk.NW, padx=180, pady=7)
+
+    self.theme_switch = CTkSwitch(
+      self.root, 
+      text="", 
+      command=self.toggle_theme,
+      width=40
+    )
+    self.theme_switch.grid(row=0, column=0, sticky=tk.NW, padx=290, pady=10)
+    self.theme_switch.select() if self.dark_mode else self.theme_switch.deselect()
 
     self.text_display = CTkTextbox(self.root, width=340, height=120, wrap=tk.WORD, font=("Calibri", 18))
     self.text_display.grid(row=1, column=0, padx=10, pady=7, sticky=tk.NW, ipadx=5)
