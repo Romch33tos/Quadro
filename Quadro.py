@@ -11,8 +11,8 @@ class QuadraticEquationSolver:
     self.root.geometry("370x505")
     self.root.resizable(width=False, height=False)
     
-    self.dark_mode = True
-    set_appearance_mode("dark")
+    self.dark_mode = False
+    set_appearance_mode("light")
     set_default_color_theme("blue")
 
     self.active_color = ("#2b7de9", "#1a5cb3")  
@@ -20,8 +20,8 @@ class QuadraticEquationSolver:
     self.border_color = self.active_color       
     self.text_color_active = "white"            
     self.text_color_disabled = ("gray70", "gray40") 
-    self.label_color = "white" 
-    self.button_text_color = "white" 
+    self.label_color = "black"  
+    self.button_text_color = "black" 
 
     self.coeff_a = 0
     self.coeff_b = 0
