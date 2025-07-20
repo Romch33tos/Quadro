@@ -94,13 +94,23 @@ class QuadraticEquationSolver:
     button.configure(state=target_state)
 
   def interpolate_color(self, color1, color2, alpha):
-    red_1, green_1, blue_1 = int(color1[0][1:3], 16), int(color1[1][3:5], 16), int(color1[2][5:7], 16)
-    red_2, green_2, blue_2 = int(color2[0][1:3], 16), int(color2[1][3:5], 16), int(color2[2][5:7], 16)
+    color1_hex = color1[0] if isinstance(color1, tuple) else color1
+    color2_hex = color2[0] if isinstance(color2, tuple) else color2
+    
+    red_1 = int(color1_hex[1:3], 16)
+    green_1 = int(color1_hex[3:5], 16) 
+    blue_1 = int(color1_hex[5:7], 16)
+    
+    red_2 = int(color2_hex[1:3], 16)
+    green_2 = int(color2_hex[3:5], 16)
+    blue_2 = int(color2_hex[5:7], 16)
+    
     red = int(red_1 + (red_2 - red_1) * alpha)
     green = int(green_1 + (green_2 - green_1) * alpha)
     blue = int(blue_1 + (blue_2 - blue_1) * alpha)
+    
     return f"#{red:02x}{green:02x}{blue:02x}"
-
+  
   def load_text_from_file(self, filename):
     try:
       base_dir = os.path.dirname(os.path.abspath(__file__))
@@ -482,7 +492,6 @@ class QuadraticEquationSolver:
       self.btn_coefficient_transfer,
       self.btn_coefficient_properties,
       self.btn_incomplete,
-      self.btn_clear
     ]
     for button in buttons:
       self.animate_button_state(button, tk.DISABLED)
@@ -499,10 +508,11 @@ class QuadraticEquationSolver:
     try:
       self.get_coefficients()
       equation = f"{self.coeff_a}x² + {self.coeff_b}x + {self.coeff_c} = 0"
+      
       if self.coeff_a == 0:
         self.text_display.insert("1.0", "Коэффициент «а» не может равняться 0!")
         self.lock_inputs()
-        self.btn_clear.configure(state = tk.NORMAL)
+        self.animate_button_state(self.btn_clear, tk.NORMAL)  # Разблокировать кнопку очистки
         return
       elif (self.coeff_b == 0) or (self.coeff_c == 0):
         self.text_display.insert("1.0", "Вы ввели неполное уравнение.")
