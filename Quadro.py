@@ -390,7 +390,7 @@ class QuadraticEquationSolver:
 
     self.btn_clear = CTkButton(
       self.root, width=150, text="Очистить все", command=self.clear_all,
-      font=("Calibri", 18, "bold"), corner_radius=7, height=25,
+      font=("Calibri", 18, "bold"), corner_radius=7, height=25, state=tk.DISABLED,
       fg_color=self.active_color, hover_color=self.hover_color,
       border_color=self.border_color, border_width=2
     )
@@ -481,7 +481,8 @@ class QuadraticEquationSolver:
       self.btn_vieta,
       self.btn_coefficient_transfer,
       self.btn_coefficient_properties,
-      self.btn_incomplete
+      self.btn_incomplete,
+      self.btn_clear
     ]
     for button in buttons:
       self.animate_button_state(button, tk.DISABLED)
@@ -498,15 +499,16 @@ class QuadraticEquationSolver:
     try:
       self.get_coefficients()
       equation = f"{self.coeff_a}x² + {self.coeff_b}x + {self.coeff_c} = 0"
-      
       if self.coeff_a == 0:
         self.text_display.insert("1.0", "Коэффициент «а» не может равняться 0!")
         self.lock_inputs()
+        self.btn_clear.configure(state = tk.NORMAL)
         return
       elif (self.coeff_b == 0) or (self.coeff_c == 0):
         self.text_display.insert("1.0", "Вы ввели неполное уравнение.")
         self.text_display.insert(tk.END, "\nВыберите метод решения.")
         self.animate_button_state(self.btn_incomplete, tk.NORMAL)
+        self.animate_button_state(self.btn_clear, tk.NORMAL)
         self.lock_inputs()
         return
 
@@ -561,9 +563,12 @@ class QuadraticEquationSolver:
       if ((self.coeff_a + self.coeff_b + self.coeff_c == 0) or
           (self.coeff_a - self.coeff_b + self.coeff_c == 0)):
         self.animate_button_state(self.btn_coefficient_properties, tk.NORMAL)
+      
+      self.animate_button_state(self.btn_clear, tk.NORMAL)
     
     except ValueError:
       self.text_display.insert("1.0", "Убедитесь, что вы ввели все данные корректно!")
+      self.btn_clear.configure(state = tk.NORMAL)
       self.lock_inputs()
 
     self.text_display.configure(state=tk.DISABLED)
@@ -617,7 +622,7 @@ class QuadraticEquationSolver:
       solution_steps
     )
  
-  def solve_with_half_discriminant (self):
+  def solve_with_half_discriminant(self):
     self.clear_text()
     self.get_coefficients()
     half_b = self.coeff_b / 2
