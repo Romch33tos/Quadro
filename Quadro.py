@@ -438,7 +438,7 @@ class QuadraticEquationSolver:
     self.btn_coefficient_transfer.grid(row=8, column=0, sticky=tk.NW, padx=190, pady=4, ipady=4, ipadx=8)
 
     self.btn_coefficient_properties = CTkButton(
-      self.root, width=150, text="a + b + c = 0", command=self.solve_with_coefficient_properties,
+      self.root, width=150, text="a ± b + c = 0", command=self.solve_with_coefficient_properties,
       font=("Calibri", 18, "bold"), corner_radius=7, height=25, state=tk.DISABLED,
       fg_color="transparent", border_color=self.border_color, border_width=2
     )
@@ -512,7 +512,7 @@ class QuadraticEquationSolver:
       if self.coeff_a == 0:
         self.text_display.insert("1.0", "Коэффициент «а» не может равняться 0!")
         self.lock_inputs()
-        self.animate_button_state(self.btn_clear, tk.NORMAL)  # Разблокировать кнопку очистки
+        self.animate_button_state(self.btn_clear, tk.NORMAL)
         return
       elif (self.coeff_b == 0) or (self.coeff_c == 0):
         self.text_display.insert("1.0", "Вы ввели неполное уравнение.")
