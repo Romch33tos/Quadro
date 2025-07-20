@@ -281,7 +281,7 @@ class QuadraticEquationSolver:
     
     return f"{a_part}{b_part}{c_part} = 0"
 
-  def save_to_history(self, equation, solution, method_name, solution_steps):
+  def save_to_history(self, equation, solution, solution_steps):
     try:
       with open(self.history_file, "a", encoding="utf-8") as file:
         file.write(f"{equation}\n")
