@@ -492,6 +492,7 @@ class QuadraticEquationSolver:
       self.btn_coefficient_transfer,
       self.btn_coefficient_properties,
       self.btn_incomplete,
+      self.btn_clear
     ]
     for button in buttons:
       self.animate_button_state(button, tk.DISABLED)
@@ -578,7 +579,7 @@ class QuadraticEquationSolver:
     
     except ValueError:
       self.text_display.insert("1.0", "Убедитесь, что вы ввели все данные корректно!")
-      self.btn_clear.configure(state = tk.NORMAL)
+      self.animate_button_state(self.btn_clear, tk.NORMAL)
       self.lock_inputs()
 
     self.text_display.configure(state=tk.DISABLED)
