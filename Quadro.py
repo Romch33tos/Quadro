@@ -515,10 +515,10 @@ class QuadraticEquationSolver:
         self.text_display.insert(tk.END, "\nВыберите метод решения.")
       else:
         self.text_display.insert(tk.END, "\nУравнение не имеет корней.")
+        self.animate_button_state(self.btn_clear, tk.NORMAL)
         self.save_to_history(
           equation,
           "Нет корней",
-          "Решение через дискриминант",
           solution_steps
         )
         self.lock_inputs()
