@@ -289,7 +289,7 @@ class QuadraticEquationSolver:
         file.write(f"Ответ: {solution}\n")
         file.write("-" * 50 + "\n")
     except Exception as error:
-      print(f"Error saving to history: {error}")
+      print(f"Ошибка при сохранении истории: {error}")
 
   def create_widgets(self):
     self.btn_help = CTkButton(
@@ -469,13 +469,34 @@ class QuadraticEquationSolver:
       return int(number)
     return round(number, 2)
 
+  def format_coeff(self, coeff, for_display=False):
+    if coeff == 1:
+      return "" if not for_display else "1"
+    elif coeff == -1:
+      return "-" if not for_display else "-1"
+    elif coeff < 0:
+      return f"-{abs(coeff)}" if not for_display else f"-{abs(coeff)}"
+    else:
+      return f"{coeff}"
+
+  def format_coeff_with_sign(self, coeff):
+    """Форматирует коэффициент со знаком для отображения в уравнениях"""
+    if coeff == 1:
+      return " + "
+    elif coeff == -1:
+      return " - "
+    elif coeff < 0:
+      return f" - {abs(coeff)}"
+    else:
+      return f" + {coeff}"
+
   def process_equation(self):
     self.disable_all_methods()
     self.clear_text()
 
     try:
       self.get_coefficients()
-      equation = f"{self.coeff_a}x² + {self.coeff_b}x + {self.coeff_c} = 0"
+      equation = self.format_equation(self.coeff_a, self.coeff_b, self.coeff_c)
       
       if self.coeff_a == 0:
         self.text_display.insert("1.0", "Коэффициент «а» не может равняться 0!")
@@ -493,15 +514,20 @@ class QuadraticEquationSolver:
       self.discriminant = self.coeff_b**2 - 4 * self.coeff_a * self.coeff_c
       formatted_discriminant = self.format_number(self.discriminant)
 
+      # Форматированные коэффициенты для отображения
+      a_display = self.format_coeff(self.coeff_a, True)
+      b_display = self.format_coeff(abs(self.coeff_b), True)
+      c_display = self.format_coeff(abs(self.coeff_c), True)
+
       solution_steps = ""
       if (self.coeff_a > 0 and self.coeff_c > 0) or (self.coeff_a < 0 and self.coeff_c < 0):
         solution_steps = (
-          f"D = {self.coeff_b}² - 4 · {self.coeff_a} · {self.coeff_c} = "
+          f"D = {self.coeff_b}² - 4 · {a_display} · {c_display} = "
           f"{self.coeff_b**2} - {4 * self.coeff_a * self.coeff_c} = {formatted_discriminant}"
         )
       elif (self.coeff_a < 0) ^ (self.coeff_c < 0):
         solution_steps = (
-          f"D = {self.coeff_b}² + 4 · {abs(self.coeff_a)} · {abs(self.coeff_c)} = "
+          f"D = {self.coeff_b}² + 4 · {a_display} · {c_display} = "
           f"{self.coeff_b**2} + {abs(4 * self.coeff_a * self.coeff_c)} = {formatted_discriminant}"
         )
 
@@ -527,6 +553,8 @@ class QuadraticEquationSolver:
       sqrt_discriminant = math.sqrt(self.discriminant)
       self.root1 = (-self.coeff_b + sqrt_discriminant) / (2 * self.coeff_a)
       self.root2 = (-self.coeff_b - sqrt_discriminant) / (2 * self.coeff_a)
+      
+      # Активация соответствующих методов решения
       self.animate_button_state(self.btn_discriminant, tk.NORMAL)
       sqrt_discriminant_int = int(sqrt_discriminant)
       root1_int = int(self.root1)
@@ -552,6 +580,7 @@ class QuadraticEquationSolver:
     self.text_display.configure(state=tk.DISABLED)
     self.lock_inputs()
 
+
   def lock_inputs(self):
     self.entry_a.configure(state=tk.DISABLED)
     self.entry_b.configure(state=tk.DISABLED)
@@ -561,41 +590,54 @@ class QuadraticEquationSolver:
   def solve_with_discriminant(self):
     self.clear_text()
     self.get_coefficients()
-    sqrt_discriminant = math.sqrt(self.discriminant)
-    formatted_discriminant = self.format_number(self.discriminant)
-    formatted_root1 = self.format_number(self.root1)
-    formatted_root2 = self.format_number(self.root2)
-
-    solution_steps = ""
     equation = self.format_equation(self.coeff_a, self.coeff_b, self.coeff_c)
 
+    solution_steps = ""
     if (self.coeff_a > 0 and self.coeff_c > 0) or (self.coeff_a < 0 and self.coeff_c < 0):
-      solution_steps += (
-        f"D = {self.coeff_b}² - 4 · {self.coeff_a} · {self.coeff_c} = "
-        f"{self.coeff_b**2} - {4 * self.coeff_a * self.coeff_c} = {formatted_discriminant}\n"
+      solution_steps = (
+        f"D = {self.coeff_b}² - 4 · {self.format_coeff(self.coeff_a, True)} · {self.format_coeff(abs(self.coeff_c), True)} = "
+        f"{self.coeff_b**2} - {4 * self.coeff_a * self.coeff_c} = {self.format_number(self.discriminant)}\n"
       )
     elif (self.coeff_a < 0) ^ (self.coeff_c < 0):
-      solution_steps += (
-        f"D = {self.coeff_b}² + 4 · {abs(self.coeff_a)} · {abs(self.coeff_c)} = "
-        f"{self.coeff_b**2} + {abs(4 * self.coeff_a * self.coeff_c)} = {formatted_discriminant}\n"
+      solution_steps = (
+        f"D = {self.coeff_b}² + 4 · {self.format_coeff(abs(self.coeff_a), True)} · {self.format_coeff(abs(self.coeff_c), True)} = "
+        f"{self.coeff_b**2} + {abs(4 * self.coeff_a * self.coeff_c)} = {self.format_number(self.discriminant)}\n"
       )
 
-    solution_steps += "По формуле корней:\n"
-    solution_steps += (
-      f"x₁ = ({-self.coeff_b} + {self.format_number(sqrt_discriminant)}) / (2 · {self.coeff_a}) = "
-      f"{self.format_number(-self.coeff_b + sqrt_discriminant)} / {2 * self.coeff_a} = {formatted_root1}\n"
-    )
-    solution_steps += (
-      f"x₂ = ({-self.coeff_b} - {self.format_number(sqrt_discriminant)}) / (2 · {self.coeff_a}) = "
-      f"{self.format_number(-self.coeff_b - sqrt_discriminant)} / {2 * self.coeff_a} = {formatted_root2}"
-    )
-
+    if self.discriminant > 0:
+      sqrt_discriminant = math.sqrt(self.discriminant)
+      root1 = (-self.coeff_b + sqrt_discriminant) / (2 * self.coeff_a)
+      root2 = (-self.coeff_b - sqrt_discriminant) / (2 * self.coeff_a)
+      formatted_root1 = self.format_number(root1)
+      formatted_root2 = self.format_number(root2)
+      
+      solution_steps += "По формуле корней:\n"
+      solution_steps += (
+        f"x₁ = ({-self.coeff_b} + √{self.format_number(self.discriminant)}) / (2 · {self.format_coeff(self.coeff_a, True)}) = "
+        f"({-self.coeff_b} + {self.format_number(sqrt_discriminant)}) / {2 * self.coeff_a} = {formatted_root1}\n"
+      )
+      solution_steps += (
+        f"x₂ = ({-self.coeff_b} - √{self.format_number(self.discriminant)}) / (2 · {self.format_coeff(self.coeff_a, True)}) = "
+        f"({-self.coeff_b} - {self.format_number(sqrt_discriminant)}) / {2 * self.coeff_a} = {formatted_root2}"
+      )
+      
+      solution = f"x₁ = {formatted_root1}, x₂ = {formatted_root2}"
+    elif self.discriminant == 0:
+      root = -self.coeff_b / (2 * self.coeff_a)
+      formatted_root = self.format_number(root)
+      
+      solution_steps += (
+        f"x = {-self.coeff_b} / (2 · {self.format_coeff(self.coeff_a, True)}) = "
+        f"{formatted_root}"
+      )
+      solution = f"x = {formatted_root}"
+  
     self.text_display.insert("1.0", solution_steps)
     self.text_display.configure(state=tk.DISABLED)
 
     self.save_to_history(
       equation,
-      f"x₁ = {formatted_root1}, x₂ = {formatted_root2}",
+      solution,
       solution_steps
     )
  
