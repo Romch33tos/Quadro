@@ -307,7 +307,7 @@ class QuadraticEquationSolver:
   def save_to_history(self, equation, solution, method_name, solution_steps):
     try:
       with open(self.history_file, "a", encoding="utf-8") as f:
-        f.write(f"Уравнение: {equation}\n")
+        f.write(f"{equation}\n")
         f.write(solution_steps + "\n")
         f.write(f"Ответ: {solution}\n")
         f.write("-" * 50 + "\n")
@@ -513,16 +513,19 @@ class QuadraticEquationSolver:
       self.discriminant = self.coeff_b**2 - 4 * self.coeff_a * self.coeff_c
       formatted_d = self.format_number(self.discriminant)
 
+      solution_steps = ""
       if (self.coeff_a > 0 and self.coeff_c > 0) or (self.coeff_a < 0 and self.coeff_c < 0):
-        self.text_display.insert("1.0",
+        solution_steps = (
           f"D = {self.coeff_b}² - 4 · {self.coeff_a} · {self.coeff_c} = "
           f"{self.coeff_b**2} - {4 * self.coeff_a * self.coeff_c} = {formatted_d}"
         )
       elif (self.coeff_a < 0) ^ (self.coeff_c < 0):
-        self.text_display.insert("1.0",
+        solution_steps = (
           f"D = {self.coeff_b}² + 4 · {abs(self.coeff_a)} · {abs(self.coeff_c)} = "
           f"{self.coeff_b**2} + {abs(4 * self.coeff_a * self.coeff_c)} = {formatted_d}"
         )
+
+      self.text_display.insert("1.0", solution_steps)
 
       if self.discriminant > 0:
         self.text_display.insert(tk.END, "\nУравнение имеет два различных корня.")
@@ -532,6 +535,12 @@ class QuadraticEquationSolver:
         self.text_display.insert(tk.END, "\nВыберите метод решения.")
       else:
         self.text_display.insert(tk.END, "\nУравнение не имеет корней.")
+        self.save_to_history(
+          equation,
+          "Нет корней",
+          "Решение через дискриминант",
+          solution_steps
+        )
         self.lock_inputs()
         return
 
@@ -552,7 +561,7 @@ class QuadraticEquationSolver:
       if ((self.coeff_a + self.coeff_b + self.coeff_c == 0) or
           (self.coeff_a - self.coeff_b + self.coeff_c == 0)):
         self.animate_button_state(self.btn_coefficient_properties, tk.NORMAL)
-     
+    
     except ValueError:
       self.text_display.insert("1.0", "Убедитесь, что вы ввели все данные корректно!")
       self.lock_inputs()
