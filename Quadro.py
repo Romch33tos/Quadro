@@ -260,7 +260,7 @@ class QuadraticEquationSolver:
         self.history_textbox.insert("1.0", history_content)
         self.history_textbox.configure(state=tk.DISABLED)
     except Exception as e:
-      print(f"Error loading history: {e}")
+      print(f"Ошибка при загрузке истории решений: {e}")
 
   def clear_history(self):
     try:
@@ -270,7 +270,7 @@ class QuadraticEquationSolver:
       self.history_textbox.delete("1.0", tk.END)
       self.history_textbox.configure(state=tk.DISABLED)
     except Exception as e:
-      print(f"Error clearing history: {e}")
+      print(f"Ошибка при очистке истории решений: {e}")
 
   def on_history_window_close(self):
     self.animate_button_state(self.btn_history, tk.NORMAL)
@@ -327,22 +327,14 @@ class QuadraticEquationSolver:
       font=("Calibri", 18), fg_color="transparent", hover=False,
       text_color=self.button_text_color
     )
-    self.btn_theory.grid(row=0, column=0, sticky=tk.NW, padx=80, pady=7)
+    self.btn_theory.grid(row=0, column=0, sticky=tk.NW, padx=85, pady=7)
 
     self.btn_history = CTkButton(
       self.root, width=80, text="История", command=self.show_history,
       font=("Calibri", 18), fg_color="transparent", hover=False,
       text_color=self.button_text_color
     )
-    self.btn_history.grid(row=0, column=0, sticky=tk.NW, padx=150, pady=7)
-
-    self.theme_label = CTkLabel(
-      self.root, 
-      text="🌙", 
-      font=("Calibri", 18),
-      text_color=self.label_color
-    )
-    self.theme_label.grid(row=0, column=0, sticky=tk.NW, padx=340, pady=5)
+    self.btn_history.grid(row=0, column=0, sticky=tk.NW, padx=165, pady=7)
 
     self.theme_switch = CTkSwitch(
       self.root, 
@@ -352,6 +344,14 @@ class QuadraticEquationSolver:
     )
     self.theme_switch.grid(row=0, column=0, sticky=tk.NW, padx=295, pady=10)
     self.theme_switch.select() if self.dark_mode else self.theme_switch.deselect()
+
+    self.theme_label = CTkLabel(
+    self.root, 
+      text="🌙", 
+      font=("Calibri", 18),
+      text_color=self.label_color
+    )
+    self.theme_label.grid(row=0, column=0, sticky=tk.NW, padx=340, pady=5)
 
     self.text_display = CTkTextbox(self.root, width=340, height=120, wrap=tk.WORD, font=("Calibri", 18))
     self.text_display.grid(row=1, column=0, padx=10, pady=7, sticky=tk.NW, ipadx=5)
