@@ -26,6 +26,6 @@ Quadro — это приложение, объединяющее различн�
 
 ## Скриншоты приложения
 
-| ![Приложение](https://github.com/user-attachments/assets/4f3c273d-93c0-4075-bb00-180fb3b1382c) | ![Дискриминант](https://github.com/user-attachments/assets/d3433b7c-b84f-4028-a167-3050bf10d816) |
+| ![screenshot_1](https://github.com/user-attachments/assets/eec79f72-1e86-49d5-9488-2f1ce30776a2) | ![screenshot_2](https://github.com/user-attachments/assets/b1ccad12-70b4-480c-ae9b-b43bb36d2fba) |
 |---|---|
-| ![Свойства коэффициентов](https://github.com/user-attachments/assets/02160a25-6cfb-4d35-a3d7-6168f6ed2992) | ![Неполное квадратное уравнение](https://github.com/user-attachments/assets/8051b02d-51fe-47ec-8a85-f2517763873c) |
+| ![screenshot_3](https://github.com/user-attachments/assets/d5a4c1d8-6f83-4766-9963-b6800f0def7f) |![screenshot_4](https://github.com/user-attachments/assets/40365eff-7ad0-45c6-a585-0281641950dd) |
