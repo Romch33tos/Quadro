@@ -26,6 +26,7 @@ class QuadraticEquationSolver:
     self.coeff_a = 0
     self.coeff_b = 0
     self.coeff_c = 0
+
     self.discriminant = 0
     self.root1 = 0
     self.root2 = 0
@@ -480,7 +481,6 @@ class QuadraticEquationSolver:
       return f"{coeff}"
 
   def format_coeff_with_sign(self, coeff):
-    """Форматирует коэффициент со знаком для отображения в уравнениях"""
     if coeff == 1:
       return " + "
     elif coeff == -1:
@@ -514,7 +514,6 @@ class QuadraticEquationSolver:
       self.discriminant = self.coeff_b**2 - 4 * self.coeff_a * self.coeff_c
       formatted_discriminant = self.format_number(self.discriminant)
 
-      # Форматированные коэффициенты для отображения
       a_display = self.format_coeff(self.coeff_a, True)
       b_display = self.format_coeff(abs(self.coeff_b), True)
       c_display = self.format_coeff(abs(self.coeff_c), True)
@@ -554,7 +553,6 @@ class QuadraticEquationSolver:
       self.root1 = (-self.coeff_b + sqrt_discriminant) / (2 * self.coeff_a)
       self.root2 = (-self.coeff_b - sqrt_discriminant) / (2 * self.coeff_a)
       
-      # Активация соответствующих методов решения
       self.animate_button_state(self.btn_discriminant, tk.NORMAL)
       sqrt_discriminant_int = int(sqrt_discriminant)
       root1_int = int(self.root1)
@@ -580,7 +578,6 @@ class QuadraticEquationSolver:
     self.text_display.configure(state=tk.DISABLED)
     self.lock_inputs()
 
-
   def lock_inputs(self):
     self.entry_a.configure(state=tk.DISABLED)
     self.entry_b.configure(state=tk.DISABLED)
@@ -604,7 +601,7 @@ class QuadraticEquationSolver:
         f"{self.coeff_b**2} + {abs(4 * self.coeff_a * self.coeff_c)} = {self.format_number(self.discriminant)}\n"
       )
 
-    if self.discriminant > 0:
+    if self.discriminant >= 0:
       sqrt_discriminant = math.sqrt(self.discriminant)
       root1 = (-self.coeff_b + sqrt_discriminant) / (2 * self.coeff_a)
       root2 = (-self.coeff_b - sqrt_discriminant) / (2 * self.coeff_a)
@@ -622,15 +619,6 @@ class QuadraticEquationSolver:
       )
       
       solution = f"x₁ = {formatted_root1}, x₂ = {formatted_root2}"
-    elif self.discriminant == 0:
-      root = -self.coeff_b / (2 * self.coeff_a)
-      formatted_root = self.format_number(root)
-      
-      solution_steps += (
-        f"x = {-self.coeff_b} / (2 · {self.format_coeff(self.coeff_a, True)}) = "
-        f"{formatted_root}"
-      )
-      solution = f"x = {formatted_root}"
   
     self.text_display.insert("1.0", solution_steps)
     self.text_display.configure(state=tk.DISABLED)
@@ -794,7 +782,7 @@ class QuadraticEquationSolver:
         solution = f"x₁ = {formatted_root1}, x₂ = {formatted_root2}"
 
     elif self.coeff_c == 0 and self.coeff_b != 0:
-      ratio = self.coeff_b / self.coeff_a
+      ratio = -self.coeff_b / self.coeff_a
       formatted_ratio = self.format_number(abs(ratio))
       sign = "-" if ratio > 0 else "+"
 
@@ -803,7 +791,7 @@ class QuadraticEquationSolver:
       solution_steps += f"x = 0 или x {sign} {formatted_ratio} = 0\n"
 
       root1 = 0
-      root2 = -ratio
+      root2 = -self.coeff_b / self.coeff_a
       formatted_root2 = self.format_number(root2)
 
       solution_steps += f"x₁ = {root1}, x₂ = {formatted_root2}"
