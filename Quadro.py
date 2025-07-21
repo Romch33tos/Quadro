@@ -657,11 +657,13 @@ class QuadraticEquationSolver:
 
     solution_steps += "Через половину коэффициента:\n"
     solution_steps += (
-      f"x₁ = ({self.format_number(-half_b)} + {self.format_number(sqrt_discriminant_4)}) / {self.coeff_a} = "
+      f"x₁ = ({self.format_number(-half_b)} + √{self.format_number(discriminant_4)}) / {self.coeff_a} = "
+      f"({self.format_number(-half_b)} + {self.format_number(sqrt_discriminant_4)}) / {self.coeff_a} = "
       f"{self.format_number(-half_b + sqrt_discriminant_4)} / {self.coeff_a} = {formatted_root1}\n"
     )
     solution_steps += (
-      f"x₂ = ({self.format_number(-half_b)} - {self.format_number(sqrt_discriminant_4)}) / {self.coeff_a} = "
+      f"x₂ = ({self.format_number(-half_b)} - √{self.format_number(discriminant_4)}) / {self.coeff_a} = "
+      f"({self.format_number(-half_b)} - {self.format_number(sqrt_discriminant_4)}) / {self.coeff_a} = "
       f"{self.format_number(-half_b - sqrt_discriminant_4)} / {self.coeff_a} = {formatted_root2}"
     )
 
