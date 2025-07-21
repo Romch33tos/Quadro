@@ -26,15 +26,25 @@ class QuadraticEquationSolver:
     self.coeff_a = 0
     self.coeff_b = 0
     self.coeff_c = 0
+
     self.discriminant = 0
     self.root1 = 0
     self.root2 = 0
 
     self.help_window = None
     self.theory_window = None
+    self.history_window = None
+
+    self.history_file = os.path.join(os.path.expanduser("~"), "quadro_history.txt")
+    self.create_history_file()
 
     self.create_widgets()
     self.root.mainloop()
+
+  def create_history_file(self):
+    if not os.path.exists(self.history_file):
+      with open(self.history_file, "w", encoding="utf-8") as file:
+        file.write("")
 
   def toggle_theme(self):
     self.dark_mode = not self.dark_mode
@@ -50,16 +60,11 @@ class QuadraticEquationSolver:
     for widget in self.root.winfo_children():
       if isinstance(widget, CTkLabel):
         widget.configure(text_color=self.label_color)
-      elif widget in [self.btn_help, self.btn_theory]:
+      elif widget in [self.btn_help, self.btn_theory, self.btn_history]:
         widget.configure(text_color=self.button_text_color)
-    
-    for alpha in range(0, 11):
-      self.root.attributes('-alpha', alpha/10)
-      self.root.update()
-      self.root.after(30)
 
   def animate_button_state(self, button, target_state):
-    if button in [self.btn_help, self.btn_theory]:
+    if button in [self.btn_help, self.btn_theory, self.btn_history]:
       if target_state == tk.NORMAL:
         button.configure(text_color=self.button_text_color)
       else:
@@ -70,27 +75,10 @@ class QuadraticEquationSolver:
     current_color = button.cget("fg_color")
     if target_state == tk.NORMAL:
       target_color = self.active_color
-      steps = 10
-      for index in range(steps + 1):
-        alpha = index / steps
-        if isinstance(current_color, tuple) and isinstance(target_color, tuple):
-          color = self.interpolate_color(current_color, target_color, alpha)
-        else:
-          color = target_color
-        button.configure(fg_color=color)
-        self.root.update()
-        self.root.after(20)
+      button.configure(fg_color=target_color)
     else:
       button.configure(fg_color="transparent", border_color=self.border_color, border_width=2)
     button.configure(state=target_state)
-
-  def interpolate_color(self, color1, color2, alpha):
-    red_1, green_1, blue_1 = int(color1[0][1:3], 16), int(color1[1][3:5], 16), int(color1[2][5:7], 16)
-    red_2, green_2, blue_2 = int(color2[0][1:3], 16), int(color2[1][3:5], 16), int(color2[2][5:7], 16)
-    red = int(red_1 + (red_2 - red_1) * alpha)
-    green = int(green_1 + (green_2 - green_1) * alpha)
-    blue = int(blue_1 + (blue_2 - blue_1) * alpha)
-    return f"#{red:02x}{green:02x}{blue:02x}"
 
   def load_text_from_file(self, filename):
     try:
@@ -100,8 +88,8 @@ class QuadraticEquationSolver:
       
       with open(filepath, "r", encoding="utf-8") as file:
         return file.read()
-    except Exception as e:
-      print(f"Error loading file {filename}: {e}")
+    except Exception as error:
+      print(f"Error loading file {filename}: {error}")
       return f"Не удалось загрузить содержимое файла {filename}"
 
   def show_help(self):
@@ -189,7 +177,6 @@ class QuadraticEquationSolver:
       return
 
     self.theory_textbox.configure(state=tk.NORMAL)
-    
     start_index = self.full_theory_text.find(section_name)
     
     if start_index != -1:
@@ -206,6 +193,105 @@ class QuadraticEquationSolver:
       self.theory_window = None
     self.animate_button_state(self.btn_theory, tk.NORMAL)
 
+  def show_history(self):
+    if self.history_window is not None:
+      self.history_window.lift()
+      return
+
+    self.animate_button_state(self.btn_history, tk.DISABLED)
+
+    self.history_window = CTkToplevel(self.root)
+    self.history_window.title("История решений")
+    self.history_window.geometry("500x400")
+    self.history_window.resizable(width=False, height=False)
+    self.history_window.protocol("WM_DELETE_WINDOW", self.on_history_window_close)
+
+    self.history_textbox = CTkTextbox(
+      self.history_window, 
+      width=480, 
+      height=340, 
+      wrap=tk.WORD, 
+      font=("Calibri", 18))
+    self.history_textbox.pack(padx=10, pady=10)
+
+    self.btn_clear_history = CTkButton(
+      self.history_window,
+      text="Очистить историю",
+      command=self.clear_history,
+      font=("Calibri", 18, "bold"),
+      width=150,
+      height=25,
+      corner_radius=7,
+      fg_color=self.active_color, hover_color=self.hover_color,
+      border_color=self.border_color, border_width=2
+    )
+    self.btn_clear_history.pack(pady=(0, 10))
+
+    self.load_history()
+
+  def load_history(self):
+    try:
+      with open(self.history_file, "r", encoding="utf-8") as file:
+        history_content = file.read()
+        self.history_textbox.configure(state=tk.NORMAL)
+        self.history_textbox.delete("1.0", tk.END)
+        self.history_textbox.insert("1.0", history_content)
+        self.history_textbox.configure(state=tk.DISABLED)
+    except Exception as error:
+      print(f"Ошибка при загрузке истории решений: {error}")
+
+  def clear_history(self):
+    try:
+      with open(self.history_file, "w", encoding="utf-8") as file:
+        file.write("")
+      self.history_textbox.configure(state=tk.NORMAL)
+      self.history_textbox.delete("1.0", tk.END)
+      self.history_textbox.configure(state=tk.DISABLED)
+    except Exception as error:
+      print(f"Ошибка при очистке истории решений: {error}")
+
+  def on_history_window_close(self):
+    self.animate_button_state(self.btn_history, tk.NORMAL)
+    self.history_window.destroy()
+    self.history_window = None
+
+  def format_equation(self, a, b, c):
+    a_part = ""
+    if a == 1:
+      a_part = "x²"
+    elif a == -1:
+      a_part = "-x²"
+    else:
+      a_part = f"{a}x²"
+    
+    b_part = ""
+    if b == 1:
+      b_part = " + x"
+    elif b == -1:
+      b_part = " - x"
+    elif b > 0:
+      b_part = f" + {b}x"
+    elif b < 0:
+      b_part = f" - {abs(b)}x"
+    
+    c_part = ""
+    if c > 0:
+      c_part = f" + {c}"
+    elif c < 0:
+      c_part = f" - {abs(c)}"
+    
+    return f"{a_part}{b_part}{c_part} = 0"
+
+  def save_to_history(self, equation, solution, solution_steps):
+    try:
+      with open(self.history_file, "a", encoding="utf-8") as file:
+        file.write(f"{equation}\n")
+        file.write(solution_steps + "\n")
+        file.write(f"Ответ: {solution}\n")
+        file.write("-" * 50 + "\n")
+    except Exception as error:
+      print(f"Ошибка при сохранении истории: {error}")
+
   def create_widgets(self):
     self.btn_help = CTkButton(
       self.root, width=80, text="Справка", command=self.show_help,
@@ -219,15 +305,14 @@ class QuadraticEquationSolver:
       font=("Calibri", 18), fg_color="transparent", hover=False,
       text_color=self.button_text_color
     )
-    self.btn_theory.grid(row=0, column=0, sticky=tk.NW, padx=90, pady=7)
+    self.btn_theory.grid(row=0, column=0, sticky=tk.NW, padx=85, pady=7)
 
-    self.theme_label = CTkLabel(
-      self.root, 
-      text="Темная тема", 
-      font=("Calibri", 18),
-      text_color=self.label_color
+    self.btn_history = CTkButton(
+      self.root, width=80, text="История", command=self.show_history,
+      font=("Calibri", 18), fg_color="transparent", hover=False,
+      text_color=self.button_text_color
     )
-    self.theme_label.grid(row=0, column=0, sticky=tk.NW, padx=180, pady=7)
+    self.btn_history.grid(row=0, column=0, sticky=tk.NW, padx=165, pady=7)
 
     self.theme_switch = CTkSwitch(
       self.root, 
@@ -235,8 +320,16 @@ class QuadraticEquationSolver:
       command=self.toggle_theme,
       width=40
     )
-    self.theme_switch.grid(row=0, column=0, sticky=tk.NW, padx=290, pady=10)
+    self.theme_switch.grid(row=0, column=0, sticky=tk.NW, padx=295, pady=10)
     self.theme_switch.select() if self.dark_mode else self.theme_switch.deselect()
+
+    self.theme_label = CTkLabel(
+      self.root, 
+      text="🌙", 
+      font=("Calibri", 18),
+      text_color=self.label_color
+    )
+    self.theme_label.grid(row=0, column=0, sticky=tk.NW, padx=340, pady=5)
 
     self.text_display = CTkTextbox(self.root, width=340, height=120, wrap=tk.WORD, font=("Calibri", 18))
     self.text_display.grid(row=1, column=0, padx=10, pady=7, sticky=tk.NW, ipadx=5)
@@ -275,7 +368,7 @@ class QuadraticEquationSolver:
 
     self.btn_clear = CTkButton(
       self.root, width=150, text="Очистить все", command=self.clear_all,
-      font=("Calibri", 18, "bold"), corner_radius=7, height=25,
+      font=("Calibri", 18, "bold"), corner_radius=7, height=25, state=tk.DISABLED,
       fg_color=self.active_color, hover_color=self.hover_color,
       border_color=self.border_color, border_width=2
     )
@@ -313,7 +406,7 @@ class QuadraticEquationSolver:
     self.btn_coefficient_transfer.grid(row=8, column=0, sticky=tk.NW, padx=190, pady=4, ipady=4, ipadx=8)
 
     self.btn_coefficient_properties = CTkButton(
-      self.root, width=150, text="a + b + c = 0", command=self.solve_with_coefficient_properties,
+      self.root, width=150, text="a ± b + c = 0", command=self.solve_with_coefficient_properties,
       font=("Calibri", 18, "bold"), corner_radius=7, height=25, state=tk.DISABLED,
       fg_color="transparent", border_color=self.border_color, border_width=2
     )
@@ -366,15 +459,36 @@ class QuadraticEquationSolver:
       self.btn_vieta,
       self.btn_coefficient_transfer,
       self.btn_coefficient_properties,
-      self.btn_incomplete
+      self.btn_incomplete,
+      self.btn_clear
     ]
     for button in buttons:
       self.animate_button_state(button, tk.DISABLED)
 
-  def format_number(self, num):
-    if num == int(num):
-      return int(num)
-    return round(num, 2)
+  def format_number(self, number):
+    if number == int(number):
+      return int(number)
+    return round(number, 2)
+
+  def format_coeff(self, coeff, for_display=False):
+    if coeff == 1:
+      return "" if not for_display else "1"
+    elif coeff == -1:
+      return "-" if not for_display else "-1"
+    elif coeff < 0:
+      return f"-{abs(coeff)}" if not for_display else f"-{abs(coeff)}"
+    else:
+      return f"{coeff}"
+
+  def format_coeff_with_sign(self, coeff):
+    if coeff == 1:
+      return " + "
+    elif coeff == -1:
+      return " - "
+    elif coeff < 0:
+      return f" - {abs(coeff)}"
+    else:
+      return f" + {coeff}"
 
   def process_equation(self):
     self.disable_all_methods()
@@ -382,30 +496,41 @@ class QuadraticEquationSolver:
 
     try:
       self.get_coefficients()
+      equation = self.format_equation(self.coeff_a, self.coeff_b, self.coeff_c)
+      
       if self.coeff_a == 0:
         self.text_display.insert("1.0", "Коэффициент «а» не может равняться 0!")
         self.lock_inputs()
+        self.animate_button_state(self.btn_clear, tk.NORMAL)
         return
       elif (self.coeff_b == 0) or (self.coeff_c == 0):
         self.text_display.insert("1.0", "Вы ввели неполное уравнение.")
         self.text_display.insert(tk.END, "\nВыберите метод решения.")
         self.animate_button_state(self.btn_incomplete, tk.NORMAL)
+        self.animate_button_state(self.btn_clear, tk.NORMAL)
         self.lock_inputs()
         return
 
       self.discriminant = self.coeff_b**2 - 4 * self.coeff_a * self.coeff_c
-      formatted_d = self.format_number(self.discriminant)
+      formatted_discriminant = self.format_number(self.discriminant)
 
+      a_display = self.format_coeff(self.coeff_a, True)
+      b_display = self.format_coeff(abs(self.coeff_b), True)
+      c_display = self.format_coeff(abs(self.coeff_c), True)
+
+      solution_steps = ""
       if (self.coeff_a > 0 and self.coeff_c > 0) or (self.coeff_a < 0 and self.coeff_c < 0):
-        self.text_display.insert("1.0",
-          f"D = {self.coeff_b}² - 4 · {self.coeff_a} · {self.coeff_c} = "
-          f"{self.coeff_b**2} - {4 * self.coeff_a * self.coeff_c} = {formatted_d}"
+        solution_steps = (
+          f"D = {self.coeff_b}² - 4 · {a_display} · {c_display} = "
+          f"{self.coeff_b**2} - {4 * self.coeff_a * self.coeff_c} = {formatted_discriminant}"
         )
       elif (self.coeff_a < 0) ^ (self.coeff_c < 0):
-        self.text_display.insert("1.0",
-          f"D = {self.coeff_b}² + 4 · {abs(self.coeff_a)} · {abs(self.coeff_c)} = "
-          f"{self.coeff_b**2} + {abs(4 * self.coeff_a * self.coeff_c)} = {formatted_d}"
+        solution_steps = (
+          f"D = {self.coeff_b}² + 4 · {a_display} · {c_display} = "
+          f"{self.coeff_b**2} + {abs(4 * self.coeff_a * self.coeff_c)} = {formatted_discriminant}"
         )
+
+      self.text_display.insert("1.0", solution_steps)
 
       if self.discriminant > 0:
         self.text_display.insert(tk.END, "\nУравнение имеет два различных корня.")
@@ -415,14 +540,21 @@ class QuadraticEquationSolver:
         self.text_display.insert(tk.END, "\nВыберите метод решения.")
       else:
         self.text_display.insert(tk.END, "\nУравнение не имеет корней.")
+        self.animate_button_state(self.btn_clear, tk.NORMAL)
+        self.save_to_history(
+          equation,
+          "Нет корней",
+          solution_steps
+        )
         self.lock_inputs()
         return
 
-      sqrt_d = math.sqrt(self.discriminant)
-      self.root1 = (-self.coeff_b + sqrt_d) / (2 * self.coeff_a)
-      self.root2 = (-self.coeff_b - sqrt_d) / (2 * self.coeff_a)
+      sqrt_discriminant = math.sqrt(self.discriminant)
+      self.root1 = (-self.coeff_b + sqrt_discriminant) / (2 * self.coeff_a)
+      self.root2 = (-self.coeff_b - sqrt_discriminant) / (2 * self.coeff_a)
+      
       self.animate_button_state(self.btn_discriminant, tk.NORMAL)
-      sqrt_d_int = int(sqrt_d)
+      sqrt_discriminant_int = int(sqrt_discriminant)
       root1_int = int(self.root1)
       root2_int = int(self.root2)
 
@@ -430,14 +562,17 @@ class QuadraticEquationSolver:
         self.animate_button_state(self.btn_half_discriminant, tk.NORMAL)
       if (self.coeff_a == 1) and root1_int == self.root1 and root2_int == self.root2:
         self.animate_button_state(self.btn_vieta, tk.NORMAL)
-      if (root1_int == self.root1 or root2_int == self.root2 or sqrt_d_int == sqrt_d):
+      if (root1_int == self.root1 or root2_int == self.root2 or sqrt_discriminant_int == sqrt_discriminant):
         self.animate_button_state(self.btn_coefficient_transfer, tk.NORMAL)
       if ((self.coeff_a + self.coeff_b + self.coeff_c == 0) or
           (self.coeff_a - self.coeff_b + self.coeff_c == 0)):
         self.animate_button_state(self.btn_coefficient_properties, tk.NORMAL)
-     
+      
+      self.animate_button_state(self.btn_clear, tk.NORMAL)
+    
     except ValueError:
       self.text_display.insert("1.0", "Убедитесь, что вы ввели все данные корректно!")
+      self.animate_button_state(self.btn_clear, tk.NORMAL)
       self.lock_inputs()
 
     self.text_display.configure(state=tk.DISABLED)
@@ -452,166 +587,231 @@ class QuadraticEquationSolver:
   def solve_with_discriminant(self):
     self.clear_text()
     self.get_coefficients()
-    sqrt_d = math.sqrt(self.discriminant)
-    formatted_d = self.format_number(self.discriminant)
-    formatted_root1 = self.format_number(self.root1)
-    formatted_root2 = self.format_number(self.root2)
+    equation = self.format_equation(self.coeff_a, self.coeff_b, self.coeff_c)
 
+    solution_steps = ""
     if (self.coeff_a > 0 and self.coeff_c > 0) or (self.coeff_a < 0 and self.coeff_c < 0):
-      self.text_display.insert("1.0",
-        f"D = {self.coeff_b}² - 4 · {self.coeff_a} · {self.coeff_c} = "
-        f"{self.coeff_b**2} - {4 * self.coeff_a * self.coeff_c} = {formatted_d}"
+      solution_steps = (
+        f"D = {self.coeff_b}² - 4 · {self.format_coeff(self.coeff_a, True)} · {self.format_coeff(abs(self.coeff_c), True)} = "
+        f"{self.coeff_b**2} - {4 * self.coeff_a * self.coeff_c} = {self.format_number(self.discriminant)}\n"
       )
     elif (self.coeff_a < 0) ^ (self.coeff_c < 0):
-      self.text_display.insert("1.0",
-        f"D = {self.coeff_b}² + 4 · {abs(self.coeff_a)} · {abs(self.coeff_c)} = "
-        f"{self.coeff_b**2} + {abs(4 * self.coeff_a * self.coeff_c)} = {formatted_d}"
+      solution_steps = (
+        f"D = {self.coeff_b}² + 4 · {self.format_coeff(abs(self.coeff_a), True)} · {self.format_coeff(abs(self.coeff_c), True)} = "
+        f"{self.coeff_b**2} + {abs(4 * self.coeff_a * self.coeff_c)} = {self.format_number(self.discriminant)}\n"
       )
 
-    self.text_display.insert(tk.END, "\nПо формуле корней:")
-    self.text_display.insert(tk.END,
-      f"\nx₁ = ({-self.coeff_b} + {self.format_number(sqrt_d)}) / (2 · {self.coeff_a}) = "
-      f"{self.format_number(-self.coeff_b + sqrt_d)} / {2 * self.coeff_a} = {formatted_root1}"
-    )
-    self.text_display.insert(tk.END,
-      f"\nx₂ = ({-self.coeff_b} - {self.format_number(sqrt_d)}) / (2 · {self.coeff_a}) = "
-      f"{self.format_number(-self.coeff_b - sqrt_d)} / {2 * self.coeff_a} = {formatted_root2}"
-    )
+    if self.discriminant >= 0:
+      sqrt_discriminant = math.sqrt(self.discriminant)
+      root1 = (-self.coeff_b + sqrt_discriminant) / (2 * self.coeff_a)
+      root2 = (-self.coeff_b - sqrt_discriminant) / (2 * self.coeff_a)
+      formatted_root1 = self.format_number(root1)
+      formatted_root2 = self.format_number(root2)
+      
+      solution_steps += "По формуле корней:\n"
+      solution_steps += (
+        f"x₁ = ({-self.coeff_b} + √{self.format_number(self.discriminant)}) / (2 · {self.format_coeff(self.coeff_a, True)}) = "
+        f"({-self.coeff_b} + {self.format_number(sqrt_discriminant)}) / {2 * self.coeff_a} = {formatted_root1}\n"
+      )
+      solution_steps += (
+        f"x₂ = ({-self.coeff_b} - √{self.format_number(self.discriminant)}) / (2 · {self.format_coeff(self.coeff_a, True)}) = "
+        f"({-self.coeff_b} - {self.format_number(sqrt_discriminant)}) / {2 * self.coeff_a} = {formatted_root2}"
+      )
+      
+      solution = f"x₁ = {formatted_root1}, x₂ = {formatted_root2}"
+  
+    self.text_display.insert("1.0", solution_steps)
     self.text_display.configure(state=tk.DISABLED)
 
+    self.save_to_history(
+      equation,
+      solution,
+      solution_steps
+    )
+ 
   def solve_with_half_discriminant(self):
     self.clear_text()
     self.get_coefficients()
     half_b = self.coeff_b / 2
-    d4 = half_b**2 - self.coeff_a * self.coeff_c
-    sqrt_d4 = math.sqrt(d4)
-    root1 = (-half_b + sqrt_d4) / self.coeff_a
-    root2 = (-half_b - sqrt_d4) / self.coeff_a
+    discriminant_4 = half_b**2 - self.coeff_a * self.coeff_c
+    sqrt_discriminant_4 = math.sqrt(discriminant_4)
+    root1 = (-half_b + sqrt_discriminant_4) / self.coeff_a
+    root2 = (-half_b - sqrt_discriminant_4) / self.coeff_a
 
-    formatted_d4 = self.format_number(d4)
+    formatted_discriminant_4 = self.format_number(discriminant_4)
     formatted_root1 = self.format_number(root1)
     formatted_root2 = self.format_number(root2)
+    equation = self.format_equation(self.coeff_a, self.coeff_b, self.coeff_c)
 
+    solution_steps = ""
     if (self.coeff_a > 0 and self.coeff_c > 0) or (self.coeff_a < 0 and self.coeff_c < 0):
-      self.text_display.insert("1.0",
+      solution_steps += (
         f"k = {self.format_number(half_b)}, D/4 = {self.format_number(half_b)}² - {self.coeff_a} · {self.coeff_c} = "
-        f"{self.format_number(half_b**2)} - {self.coeff_a * self.coeff_c} = {formatted_d4}"
+        f"{self.format_number(half_b**2)} - {self.coeff_a * self.coeff_c} = {formatted_discriminant_4}\n"
       )
     elif (self.coeff_a < 0) ^ (self.coeff_c < 0):
-      self.text_display.insert("1.0",
+      solution_steps += (
         f"k = {self.format_number(half_b)}, D/4 = {self.format_number(half_b)}² + {abs(self.coeff_a)} · {abs(self.coeff_c)} = "
-        f"{self.format_number(half_b**2)} + {abs(self.coeff_a * self.coeff_c)} = {formatted_d4}"
+        f"{self.format_number(half_b**2)} + {abs(self.coeff_a * self.coeff_c)} = {formatted_discriminant_4}\n"
       )
 
-    self.text_display.insert(tk.END, "\nЧерез половину коэффициента:")
-    self.text_display.insert(tk.END,
-      f"\nx₁ = ({self.format_number(-half_b)} + {self.format_number(sqrt_d4)}) / {self.coeff_a} = "
-      f"{self.format_number(-half_b + sqrt_d4)} / {self.coeff_a} = {formatted_root1}"
+    solution_steps += "Через половину коэффициента:\n"
+    solution_steps += (
+      f"x₁ = ({self.format_number(-half_b)} + √{self.format_number(discriminant_4)}) / {self.coeff_a} = "
+      f"({self.format_number(-half_b)} + {self.format_number(sqrt_discriminant_4)}) / {self.coeff_a} = "
+      f"{self.format_number(-half_b + sqrt_discriminant_4)} / {self.coeff_a} = {formatted_root1}\n"
     )
-    self.text_display.insert(tk.END,
-      f"\nx₂ = ({self.format_number(-half_b)} - {self.format_number(sqrt_d4)}) / {self.coeff_a} = "
-      f"{self.format_number(-half_b - sqrt_d4)} / {self.coeff_a} = {formatted_root2}"
+    solution_steps += (
+      f"x₂ = ({self.format_number(-half_b)} - √{self.format_number(discriminant_4)}) / {self.coeff_a} = "
+      f"({self.format_number(-half_b)} - {self.format_number(sqrt_discriminant_4)}) / {self.coeff_a} = "
+      f"{self.format_number(-half_b - sqrt_discriminant_4)} / {self.coeff_a} = {formatted_root2}"
     )
+
+    self.text_display.insert("1.0", solution_steps)
     self.text_display.configure(state=tk.DISABLED)
+
+    self.save_to_history(
+      equation,
+      f"x₁ = {formatted_root1}, x₂ = {formatted_root2}",
+      solution_steps
+    )
 
   def solve_with_vieta(self):
     self.clear_text()
     self.get_coefficients()
     formatted_root1 = self.format_number(self.root1)
     formatted_root2 = self.format_number(self.root2)
+    equation = self.format_equation(self.coeff_a, self.coeff_b, self.coeff_c)
 
-    self.text_display.insert("1.0", "По теореме Виета:")
-    self.text_display.insert(tk.END, f"\nx₁ + x₂ = {-self.coeff_b}")
-    self.text_display.insert(tk.END, f"\nx₁ · x₂ = {self.coeff_c}")
-    self.text_display.insert(tk.END, f"\nx₁ = {formatted_root1}, x₂ = {formatted_root2}")
+    solution_steps = "По теореме Виета:\n"
+    solution_steps += f"x₁ + x₂ = {-self.coeff_b}\n"
+    solution_steps += f"x₁ · x₂ = {self.coeff_c}\n"
+    solution_steps += f"x₁ = {formatted_root1}, x₂ = {formatted_root2}"
+
+    self.text_display.insert("1.0", solution_steps)
     self.text_display.configure(state=tk.DISABLED)
+
+    self.save_to_history(
+      equation,
+      f"x₁ = {formatted_root1}, x₂ = {formatted_root2}",
+      solution_steps
+    )
 
   def solve_with_coefficient_transfer(self):
     self.clear_text()
     self.get_coefficients()
     formatted_root1 = self.format_number(self.root1)
     formatted_root2 = self.format_number(self.root2)
+    equation = self.format_equation(self.coeff_a, self.coeff_b, self.coeff_c)
 
-    self.text_display.insert("1.0", "Методом переброски коэффициента:")
-    self.text_display.insert(tk.END, f"\nx₁ + x₂ = {-self.coeff_b}")
-    self.text_display.insert(tk.END, f"\nx₁ · x₂ = {self.coeff_c * self.coeff_a}")
-    self.text_display.insert(tk.END,
-      f"\nx₁ = {self.format_number(self.root1 * self.coeff_a)} / {self.coeff_a} = {formatted_root1}, "
+    solution_steps = "Методом переброски коэффициента:\n"
+    solution_steps += f"x₁ + x₂ = {-self.coeff_b}\n"
+    solution_steps += f"x₁ · x₂ = {self.coeff_c * self.coeff_a}\n"
+    solution_steps += (
+      f"x₁ = {self.format_number(self.root1 * self.coeff_a)} / {self.coeff_a} = {formatted_root1}, "
       f"x₂ = {self.format_number(self.root2 * self.coeff_a)} / {self.coeff_a} = {formatted_root2}"
     )
+
+    self.text_display.insert("1.0", solution_steps)
     self.text_display.configure(state=tk.DISABLED)
+
+    self.save_to_history(
+      equation,
+      f"x₁ = {formatted_root1}, x₂ = {formatted_root2}",
+      solution_steps
+    )
 
   def solve_with_coefficient_properties(self):
     self.clear_text()
     self.get_coefficients()
-
-    self.text_display.insert("1.0", "По свойству коэффициентов:")
+    equation = self.format_equation(self.coeff_a, self.coeff_b, self.coeff_c)
+    solution_steps = "По свойству коэффициентов:\n"
+    
     if self.coeff_a + self.coeff_b + self.coeff_c == 0:
       root2 = self.coeff_c / self.coeff_a
       formatted_root2 = self.format_number(root2)
 
-      self.text_display.insert(tk.END, "\nТак как a + b + c = 0,")
-      self.text_display.insert(tk.END, "\nx₁ = 1")
-      self.text_display.insert(tk.END, f"\nx₂ = c / a = {self.coeff_c} / {self.coeff_a} = {formatted_root2}")
+      solution_steps += "Так как a + b + c = 0:\n"
+      solution_steps += "x₁ = 1\n"
+      solution_steps += f"x₂ = c / a = {self.coeff_c} / {self.coeff_a} = {formatted_root2}"
+      
+      solution = f"x₁ = 1, x₂ = {formatted_root2}"
+    
 
     if self.coeff_a - self.coeff_b + self.coeff_c == 0:
       root2 = -self.coeff_c / self.coeff_a
       formatted_root2 = self.format_number(root2)
 
-      self.text_display.insert(tk.END, "\nТак как a - b + c = 0,")
-      self.text_display.insert(tk.END, "\nx₁ = -1")
-      self.text_display.insert(tk.END, f"\nx₂ = -c / a = {-self.coeff_c} / {self.coeff_a} = {formatted_root2}")
-
+      solution_steps += "Так как a - b + c = 0:\n"
+      solution_steps += "x₁ = -1\n"
+      solution_steps += f"x₂ = -c / a = {-self.coeff_c} / {self.coeff_a} = {formatted_root2}"
+      
+      solution = f"x₁ = -1, x₂ = {formatted_root2}"
+  
+    self.text_display.insert("1.0", solution_steps)
     self.text_display.configure(state=tk.DISABLED)
+
+    self.save_to_history(
+      equation,
+      solution,
+      solution_steps
+    )
 
   def solve_incomplete(self):
     self.get_coefficients()
     self.clear_text()
-
-    a_sign = "-" if self.coeff_a == -1 else "" if self.coeff_a == 1 else self.coeff_a
-    b_sign = "" if abs(self.coeff_b) == 1 else abs(self.coeff_b)
-    sign = "+" if (self.coeff_c > 0 or self.coeff_b > 0) else "-"
+    equation = self.format_equation(self.coeff_a, self.coeff_b, self.coeff_c)
+    solution_steps = ""
 
     if self.coeff_c != 0 and self.coeff_b == 0:
       ratio = -self.coeff_c / self.coeff_a
       formatted_ratio = self.format_number(ratio)
 
-      self.text_display.insert("1.0", f"{a_sign}x² {sign} {abs(self.coeff_c)} = 0")
-      self.text_display.insert(tk.END, f"\nx² = {formatted_ratio}")
+      solution_steps += f"{equation}\n"
+      solution_steps += f"x² = {formatted_ratio}\n"
+      
       if ratio < 0:
-        self.text_display.insert(tk.END, "\nНет корней!")
+        solution_steps += "Нет корней!"
+        solution = "Нет корней"
       else:
         root1 = math.sqrt(ratio)
         root2 = -math.sqrt(ratio)
         formatted_root1 = self.format_number(root1)
         formatted_root2 = self.format_number(root2)
 
-        self.text_display.insert(tk.END, f"\nx₁ = {formatted_root1}")
-        self.text_display.insert(tk.END, f"\nx₂ = {formatted_root2}")
+        solution_steps += f"x₁ = {formatted_root1}\n"
+        solution_steps += f"x₂ = {formatted_root2}"
+        solution = f"x₁ = {formatted_root1}, x₂ = {formatted_root2}"
 
     elif self.coeff_c == 0 and self.coeff_b != 0:
-      sign = "+" if (self.coeff_a < 0 and self.coeff_b < 0) else "-" if (self.coeff_a < 0) else sign
-      a_sign = "" if self.coeff_a == -1 else abs(self.coeff_a) if self.coeff_a < 0 else a_sign
-
-      self.text_display.insert("1.0", f"{a_sign}x² {sign} {b_sign}x = 0")
-
-      ratio = self.coeff_b / self.coeff_a
+      ratio = -self.coeff_b / self.coeff_a
       formatted_ratio = self.format_number(abs(ratio))
+      sign = "-" if ratio > 0 else "+"
 
-      self.text_display.insert(tk.END, f"\n{a_sign}x · (x {sign} {formatted_ratio}) = 0")
-      self.text_display.insert(tk.END, f"\n{a_sign}x = 0, (x {sign} {formatted_ratio}) = 0")
+      solution_steps += f"{equation}\n"
+      solution_steps += f"x · (x {sign} {formatted_ratio}) = 0\n"
+      solution_steps += f"x = 0 или x {sign} {formatted_ratio} = 0\n"
 
       root1 = 0
-      root2 = -ratio
+      root2 = -self.coeff_b / self.coeff_a
       formatted_root2 = self.format_number(root2)
 
-      self.text_display.insert(tk.END, f"\nx₁ = {root1}, x₂ = {formatted_root2}")
+      solution_steps += f"x₁ = {root1}, x₂ = {formatted_root2}"
+      solution = f"x₁ = {root1}, x₂ = {formatted_root2}"
 
     elif self.coeff_a != 0 and self.coeff_b == 0 and self.coeff_c == 0:
-      self.text_display.insert("1.0", f"{a_sign}x² = 0")
-      self.text_display.insert(tk.END, "\nx = 0")
-
+      solution_steps += f"{equation}\n"
+      solution_steps += "x = 0"
+      solution = "x = 0"
+    
+    self.text_display.insert("1.0", solution_steps)
     self.text_display.configure(state=tk.DISABLED)
+
+    self.save_to_history(
+      equation,
+      solution,
+      solution_steps
+    )
 
 if __name__ == "__main__":
   QuadraticEquationSolver()
