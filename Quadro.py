@@ -214,8 +214,11 @@ class QuadraticEquationSolver:
       font=("Calibri", 18))
     self.history_textbox.pack(padx=10, pady=10)
 
+    button_frame = tk.Frame(self.history_window)
+    button_frame.pack(pady=(0, 10))
+
     self.btn_clear_history = CTkButton(
-      self.history_window,
+      button_frame,
       text="Очистить историю",
       command=self.clear_history,
       font=("Calibri", 18, "bold"),
@@ -225,7 +228,20 @@ class QuadraticEquationSolver:
       fg_color=self.active_color, hover_color=self.hover_color,
       border_color=self.border_color, border_width=2
     )
-    self.btn_clear_history.pack(pady=(0, 10))
+    self.btn_clear_history.pack(side=tk.LEFT, padx=(0, 10))
+
+    self.btn_export_history = CTkButton(
+      button_frame,
+      text="Экспорт в txt",
+      command=self.export_history,
+      font=("Calibri", 18, "bold"),
+      width=150,
+      height=25,
+      corner_radius=7,
+      fg_color=self.active_color, hover_color=self.hover_color,
+      border_color=self.border_color, border_width=2
+    )
+    self.btn_export_history.pack(side=tk.LEFT)
 
     self.load_history()
 
@@ -249,6 +265,25 @@ class QuadraticEquationSolver:
       self.history_textbox.configure(state=tk.DISABLED)
     except Exception as error:
       print(f"Ошибка при очистке истории решений: {error}")
+
+  def export_history(self):
+    try:
+      from tkinter import filedialog
+      file_path = filedialog.asksaveasfilename(
+        defaultextension=".txt",
+        filetypes=[("Text files", "*.txt"), ("All files", "*.*")]
+      )
+      if not file_path:
+        return
+
+      with open(self.history_file, "r", encoding="utf-8") as source_file:
+        history_content = source_file.read()
+
+      with open(file_path, "w", encoding="utf-8") as target_file:
+        target_file.write(history_content)
+
+    except Exception as error:
+      print(f"Ошибка при экспорте истории: {error}")
 
   def on_history_window_close(self):
     self.animate_button_state(self.btn_history, tk.NORMAL)
